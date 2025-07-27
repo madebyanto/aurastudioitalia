@@ -301,20 +301,17 @@
     right: -250px;
     width: 250px;
     height: 100vh;
-    background: rgba(255, 255, 255, 0.1); /* molto trasparente */
-    backdrop-filter: blur(20px);           /* sfocatura netta */
-    -webkit-backdrop-filter: blur(20px);
-    border-left: 1px solid rgba(255, 255, 255, 0.2);
+    background: #E515F6; /* magenta deciso */
+    box-shadow: -4px 0 10px rgba(229, 21, 246, 0.7); /* ombra sul bordo sinistro */
+    border-radius: 15px 0 0 15px;
     display: flex;
     flex-direction: column;
     padding: 60px 20px 20px 20px;
     gap: 20px;
     transition: right 0.3s ease;
-    border-radius: 15px 0 0 15px;
     z-index: 1099;
     overflow-y: auto;
     color: #fff;
-    /* Importante: rimuovi eventuali box-shadow o colori pieni che possono coprire */
   }
 }
   </style>
