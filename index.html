@@ -194,6 +194,52 @@
     .popup-content button:hover {
       background: #c109d2;
     }
+
+.menu {
+  display: none;
+  flex-direction: column;
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border-radius: 10px;
+  padding: 10px;
+  z-index: 1000;
+}
+
+.menu a {
+  color: white;
+  text-decoration: none;
+  margin: 5px 0;
+}
+
+.hamburger {
+  font-size: 24px;
+  cursor: pointer;
+  user-select: none;
+}
+
+@media (min-width: 768px) {
+  .menu {
+    display: flex !important;
+    flex-direction: row;
+    position: static;
+    background: none;
+    border: none;
+    backdrop-filter: none;
+    padding: 0;
+  }
+
+  .menu a {
+    margin: 0 10px;
+  }
+
+  .hamburger {
+    display: none;
+  }
+}
   </style>
 </head>
 <body>
@@ -208,6 +254,12 @@
 
   <div class="container">
     <header>
+<div class="hamburger" onclick="toggleMenu()">☰</div>
+<nav class="menu" id="menu">
+  <a href="#">Home</a>
+  <a href="#">Scopri</a>
+  <a href="#">Profilo</a>
+</nav>
       <h1>Aura Studio</h1>
       <p>Aura è un’iniziativa italiana che ridefinisce l’intrattenimento digitale e sociale attraverso la sua community e un ecosistema innovativo.</p>
     </header>
@@ -324,5 +376,15 @@
     <a href="https://3cgtsgco.forms.app/aurastudio-staff-provino">Lavora con noi</a>
   </p>
 </footer>
+<script>
+  function toggleMenu() {
+    const menu = document.getElementById('menu');
+    if (menu.style.display === 'flex') {
+      menu.style.display = 'none';
+    } else {
+      menu.style.display = 'flex';
+    }
+  }
+</script>
 </body>
 </html>
