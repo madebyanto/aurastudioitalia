@@ -301,10 +301,11 @@
     right: -250px;
     width: 250px;
     height: 100vh;
-    background: rgba(227, 10, 245, 0.35); /* magenta traslucido Aura */
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    border: 2px solid #000000; /* bordo nero ben visibile */
+    background: rgba(255, 255, 255, 0.2); /* identico alla navbar */
+    backdrop-filter: blur(10px);          /* identico alla navbar */
+    -webkit-backdrop-filter: blur(10px);  /* Safari */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    border-left: 1px solid rgba(255, 255, 255, 0.2);
     display: flex;
     flex-direction: column;
     padding: 60px 20px 20px 20px;
@@ -312,7 +313,10 @@
     transition: right 0.3s ease;
     border-radius: 15px 0 0 15px;
     z-index: 1099;
-    overflow-y: auto
+    overflow-y: auto;
+    color: #fff;
+  }
+}
   </style>
 </head>
 <body>
