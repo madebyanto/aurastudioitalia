@@ -245,11 +245,70 @@
     font-size: 16px;
   }
 }
+
+.hamburger {
+  font-size: 28px;
+  cursor: pointer;
+  color: #fff;
+  user-select: none;
+  display: none;
+  z-index: 1100;
+}
+
+@media (max-width: 768px) {
+  .hamburger {
+    display: block;
+  }
+
+  .nav-links {
+    position: fixed;
+    top: 0;
+    right: -250px; /* fuori schermo a destra */
+    width: 250px;
+    height: 100%;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    display: flex;
+    flex-direction: column;
+    padding: 60px 20px 20px 20px;
+    gap: 20px;
+    transition: right 0.3s ease;
+    border-radius: 15px 0 0 15px;
+    z-index: 1099;
+  }
+
+  .nav-links.show {
+    right: 0;
+  }
+
+  .nav-links a {
+    color: #fff;
+    font-weight: 400;
+    font-size: 18px;
+    text-decoration: none;
+  }
+
+  .nav-links a:hover {
+    text-decoration: underline;
+  }
+}
+
+@media (min-width: 769px) {
+  .nav-links {
+    display: flex !important;
+    position: static;
+    flex-direction: row;
+    background: none;
+    padding: 0;
+    border-radius: 0;
+  }
+}
   </style>
 </head>
 <body>
 
-  <nav class="navbar">
+<nav class="navbar">
   <img src="auraplus.png" alt="Aura Logo">
 
   <div class="hamburger" onclick="toggleMenu()">☰</div>
@@ -381,11 +440,7 @@
 <script>
   function toggleMenu() {
     const menu = document.getElementById('menu');
-    if (menu.style.display === 'flex') {
-      menu.style.display = 'none';
-    } else {
-      menu.style.display = 'flex';
-    }
+    menu.classList.toggle('show');
   }
 </script>
 </body>
