@@ -195,49 +195,54 @@
       background: #c109d2;
     }
 
-.menu {
-  display: none;
-  flex-direction: column;
-  position: fixed;
-  top: 20px;
-  left: 20px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(10px);
-  border-radius: 10px;
-  padding: 10px;
-  z-index: 1000;
-}
-
-.menu a {
-  color: white;
-  text-decoration: none;
-  margin: 5px 0;
-}
-
 .hamburger {
-  font-size: 24px;
+  font-size: 26px;
   cursor: pointer;
-  user-select: none;
+  color: white;
+  display: block;
 }
 
 @media (min-width: 768px) {
-  .menu {
+  .hamburger {
+    display: none;
+  }
+
+  .nav-links {
     display: flex !important;
     flex-direction: row;
     position: static;
     background: none;
     border: none;
     backdrop-filter: none;
+    height: auto;
+    width: auto;
     padding: 0;
   }
 
-  .menu a {
-    margin: 0 10px;
+  .nav-links a {
+    margin: 0 15px;
+  }
+}
+
+@media (max-width: 767px) {
+  .nav-links {
+    display: none;
+    flex-direction: column;
+    position: fixed;
+    top: 60px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(12px);
+    border-radius: 10px;
+    padding: 15px;
+    z-index: 9999;
   }
 
-  .hamburger {
-    display: none;
+  .nav-links a {
+    color: white;
+    text-decoration: none;
+    margin: 10px 0;
+    font-size: 16px;
   }
 }
   </style>
@@ -245,21 +250,18 @@
 <body>
 
   <nav class="navbar">
-    <img src="auraplus.png" alt="Aura Logo">
-    <div class="nav-links">
- <a onclick="openPopup('popupAccount')">Crea un'account</a>
-      <a onclick="openPopup('popupTrademark')">Informazioni sul marchio protetto</a>
-    </div>
-  </nav>
+  <img src="auraplus.png" alt="Aura Logo">
+
+  <div class="hamburger" onclick="toggleMenu()">☰</div>
+
+  <div class="nav-links" id="menu">
+    <a onclick="openPopup('popupAccount')">Crea un'account</a>
+    <a onclick="openPopup('popupTrademark')">Informazioni sul marchio protetto</a>
+  </div>
+</nav>
 
   <div class="container">
     <header>
-<div class="hamburger" onclick="toggleMenu()">☰</div>
-<nav class="menu" id="menu">
-  <a href="#">Home</a>
-  <a href="#">Scopri</a>
-  <a href="#">Profilo</a>
-</nav>
       <h1>Aura Studio</h1>
       <p>Aura è un’iniziativa italiana che ridefinisce l’intrattenimento digitale e sociale attraverso la sua community e un ecosistema innovativo.</p>
     </header>
