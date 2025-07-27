@@ -300,11 +300,11 @@
     top: 0;
     right: -250px;
     width: 250px;
-    height: 100vh; /* full viewport height */
-    background: rgba(255, 255, 255, 0.15); /* sfondo più trasparente per miglior blur */
-    backdrop-filter: blur(30px);          /* blur molto netto */
-    -webkit-backdrop-filter: blur(30px);  /* compatibilità Safari */
-    border: 1px solid rgba(255, 255, 255, 0.35); /* bordo più visibile */
+    height: 100vh;
+    background: rgba(255, 255, 255, 0.05); /* quasi trasparente, lascia vedere il sotto */
+    backdrop-filter: blur(30px);           /* sfocatura netta del contenuto sottostante */
+    -webkit-backdrop-filter: blur(30px);   /* compatibilità Safari */
+    border: 1px solid rgba(255, 255, 255, 0.1);
     display: flex;
     flex-direction: column;
     padding: 60px 20px 20px 20px;
@@ -312,7 +312,7 @@
     transition: right 0.3s ease;
     border-radius: 15px 0 0 15px;
     z-index: 1099;
-    overflow-y: auto; /* scroll se necessario */
+    overflow-y: auto;
   }
 }
   </style>
