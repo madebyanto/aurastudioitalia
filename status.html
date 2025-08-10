@@ -52,7 +52,7 @@
   </div>
 
   <div class="service" onclick="toggleStatus('statusNyra')">
-    <h2>😢 Nyra</h2>
+    <h2>Nyra</h2>
     <div id="statusNyra" class="status"></div>
   </div>
 
@@ -66,13 +66,15 @@
     const MESSAGGI = {
       online: "Il servizio funziona correttamente ✅️",
       offline: "Stiamo riscontrando problemi con questo servizio 💔"
+      support_on: "Il supporto è disponibile ✅️"
+      support_off: "Il supporto non è disponibile ❌️"
     };
 
     // Stato dei servizi (modifica qui: "online" o "offline")
     const statoServizi = {
       accountAura: "online",
-      nyra: "offline",
-      supporto: "online"
+      nyra: "online",
+      supporto: "support_off"
     };
 
     // Inizializza testi
