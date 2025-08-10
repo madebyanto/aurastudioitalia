@@ -1,124 +1,91 @@
-<!-- STATUS SERVIZI -->
-<div class="status-section" style="margin-top:40px;">
-  <h2>Status Servizi</h2>
-  <div id="services-status">
-    <!-- I servizi vengono generati tramite JS -->
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Status Servizi - Aura 🩷</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #E30AF5, #F174FF);
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+    }
+    h1 {
+      margin-top: 20px;
+      font-size: 2.2em;
+    }
+    .service {
+      background: rgba(255, 255, 255, 0.2);
+      margin: 15px auto;
+      padding: 15px;
+      border-radius: 15px;
+      max-width: 500px;
+      cursor: pointer;
+      text-align: left;
+      transition: transform 0.2s ease;
+    }
+    .service:hover {
+      transform: translateY(-3px);
+    }
+    .service h2 {
+      margin: 0;
+      font-size: 1.4em;
+    }
+    .status {
+      margin-top: 8px;
+      display: none;
+      font-weight: 300;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Status dei Servizi</h1>
+  <p>Clicca su un servizio per vedere il suo stato attuale</p>
+
+  <div class="service" onclick="toggleStatus('statusAccount')">
+    <h2>Account Aura</h2>
+    <div id="statusAccount" class="status"></div>
   </div>
-</div>
 
-<style>
-.status-service {
-  background: rgba(255,255,255,0.22);
-  color: #fff;
-  padding: 18px 22px;
-  border-radius: 12px;
-  margin: 15px 0;
-  font-size: 1.15em;
-  font-weight: 500;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  transition: box-shadow 0.2s;
-  position: relative;
-}
-.status-service:hover {
-  box-shadow: 0 2px 12px rgba(227,10,245,0.13);
-}
-.status-label {
-  font-weight: 600;
-  font-size: 1.15em;
-  letter-spacing: 0.5px;
-}
-.status-indicator {
-  padding: 3px 13px;
-  border-radius: 7px;
-  font-size: 0.95em;
-  font-weight: 600;
-  margin-left: 12px;
-  background: #28c76f22;
-  color: #28c76f;
-  transition: background 0.2s, color 0.2s;
-}
-.status-service.offline .status-indicator {
-  background: #fa586522;
-  color: #fa5865;
-}
-.arrow {
-  margin-left: 15px;
-  font-size: 1.2em;
-  transition: transform 0.27s;
-}
-.status-dropdown {
-  display: none;
-  padding: 15px 15px 12px 10px;
-  background: rgba(255,255,255,0.11);
-  color: #fff;
-  margin-top: 4px;
-  border-radius: 0 0 11px 11px;
-  font-size: 1.05em;
-  animation: fadeIn 0.4s;
-}
-.status-service.open .status-dropdown {
-  display: block;
-}
-.status-service.open .arrow {
-  transform: rotate(180deg);
-}
-</style>
+  <div class="service" onclick="toggleStatus('statusNyra')">
+    <h2>Nyra</h2>
+    <div id="statusNyra" class="status"></div>
+  </div>
 
-// Cambia in 'offline' per mostrare il messaggio offline
+  <div class="service" onclick="toggleStatus('statusSupporto')">
+    <h2>Supporto</h2>
+    <div id="statusSupporto" class="status"></div>
+  </div>
 
-<script>
-// Cambia qui lo stato dei servizi: "online" o "offline"
-const services = [
-  {
-    name: "Account Aura",
-    status: "online", 
-  },
-  {
-    name: "Nyra",
-    status: "offline",
-  },
-  {
-    name: "Supporto",
-    status: "online",
-  }
-];
+  <script>
+    // Frasi di default
+    const MESSAGGI = {
+      online: "Il servizio funziona correttamente ✅️",
+      offline: "Stiamo riscontrando problemi con questo servizio 💔"
+    };
 
-const statusMessages = {
-  online: "Il servizio funziona correttamente ✅️",
-  offline: "Stiamo riscontrando problemi con questo servizio 💔"
-};
+    // Stato dei servizi (modifica qui: "online" o "offline")
+    const statoServizi = {
+      accountAura: "online",
+      nyra: "online",
+      supporto: "online"
+    };
 
-const statusColors = {
-  online: "#28c76f",
-  offline: "#fa5865"
-};
+    // Inizializza testi
+    document.getElementById("statusAccount").textContent = MESSAGGI[statoServizi.accountAura];
+    document.getElementById("statusNyra").textContent = MESSAGGI[statoServizi.nyra];
+    document.getElementById("statusSupporto").textContent = MESSAGGI[statoServizi.supporto];
 
-function renderServicesStatus() {
-  const container = document.getElementById('services-status');
-  container.innerHTML = '';
-  services.forEach((service, idx) => {
-    const isOnline = service.status === 'online';
-    const serviceDiv = document.createElement('div');
-    serviceDiv.className = `status-service${isOnline ? '' : ' offline'}`;
-    serviceDiv.innerHTML = `
-      <span>
-        <span class="status-label">${service.name}</span>
-        <span class="status-indicator">${isOnline ? 'Online' : 'Offline'}</span>
-      </span>
-      <span class="arrow">&#9660;</span>
-      <div class="status-dropdown">${statusMessages[service.status]}</div>
-    `;
-    serviceDiv.addEventListener('click', function(e) {
-      // Solo se clicchi sulla testata (non sulla dropdown interna)
-      if (!e.target.classList.contains('status-dropdown')) {
-        this.classList.toggle('open');
-      }
-    });
-    container.appendChild(serviceDiv);
-  });
-}
-document.addEventListener('DOMContentLoaded', renderServicesStatus);
-</script>
+    // Toggle visibilità menu a tendina
+    function toggleStatus(id) {
+      const el = document.getElementById(id);
+      el.style.display = el.style.display === "block" ? "none" : "block";
+    }
+  </script>
+
+</body>
+</html>
