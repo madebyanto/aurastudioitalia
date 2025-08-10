@@ -1,0 +1,124 @@
+<!-- STATUS SERVIZI -->
+<div class="status-section" style="margin-top:40px;">
+  <h2>Status Servizi</h2>
+  <div id="services-status">
+    <!-- I servizi vengono generati tramite JS -->
+  </div>
+</div>
+
+<style>
+.status-service {
+  background: rgba(255,255,255,0.22);
+  color: #fff;
+  padding: 18px 22px;
+  border-radius: 12px;
+  margin: 15px 0;
+  font-size: 1.15em;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: box-shadow 0.2s;
+  position: relative;
+}
+.status-service:hover {
+  box-shadow: 0 2px 12px rgba(227,10,245,0.13);
+}
+.status-label {
+  font-weight: 600;
+  font-size: 1.15em;
+  letter-spacing: 0.5px;
+}
+.status-indicator {
+  padding: 3px 13px;
+  border-radius: 7px;
+  font-size: 0.95em;
+  font-weight: 600;
+  margin-left: 12px;
+  background: #28c76f22;
+  color: #28c76f;
+  transition: background 0.2s, color 0.2s;
+}
+.status-service.offline .status-indicator {
+  background: #fa586522;
+  color: #fa5865;
+}
+.arrow {
+  margin-left: 15px;
+  font-size: 1.2em;
+  transition: transform 0.27s;
+}
+.status-dropdown {
+  display: none;
+  padding: 15px 15px 12px 10px;
+  background: rgba(255,255,255,0.11);
+  color: #fff;
+  margin-top: 4px;
+  border-radius: 0 0 11px 11px;
+  font-size: 1.05em;
+  animation: fadeIn 0.4s;
+}
+.status-service.open .status-dropdown {
+  display: block;
+}
+.status-service.open .arrow {
+  transform: rotate(180deg);
+}
+</style>
+
+// Cambia in 'offline' per mostrare il messaggio offline
+
+<script>
+// Cambia qui lo stato dei servizi: "online" o "offline"
+const services = [
+  {
+    name: "Account Aura",
+    status: "online", 
+  },
+  {
+    name: "Nyra",
+    status: "offline",
+  },
+  {
+    name: "Supporto",
+    status: "online",
+  }
+];
+
+const statusMessages = {
+  online: "Il servizio funziona correttamente ✅️",
+  offline: "Stiamo riscontrando problemi con questo servizio 💔"
+};
+
+const statusColors = {
+  online: "#28c76f",
+  offline: "#fa5865"
+};
+
+function renderServicesStatus() {
+  const container = document.getElementById('services-status');
+  container.innerHTML = '';
+  services.forEach((service, idx) => {
+    const isOnline = service.status === 'online';
+    const serviceDiv = document.createElement('div');
+    serviceDiv.className = `status-service${isOnline ? '' : ' offline'}`;
+    serviceDiv.innerHTML = `
+      <span>
+        <span class="status-label">${service.name}</span>
+        <span class="status-indicator">${isOnline ? 'Online' : 'Offline'}</span>
+      </span>
+      <span class="arrow">&#9660;</span>
+      <div class="status-dropdown">${statusMessages[service.status]}</div>
+    `;
+    serviceDiv.addEventListener('click', function(e) {
+      // Solo se clicchi sulla testata (non sulla dropdown interna)
+      if (!e.target.classList.contains('status-dropdown')) {
+        this.classList.toggle('open');
+      }
+    });
+    container.appendChild(serviceDiv);
+  });
+}
+document.addEventListener('DOMContentLoaded', renderServicesStatus);
+</script>
