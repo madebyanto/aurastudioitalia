@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nyra Chat</title>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            color: #e2e2e2;
+            overflow: hidden;
+        }
+
+        .file-upload-label {
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 50%;
+            transition: background-color 0.2s ease;
+        }
+
+        .file-upload-label:hover {
+            background-color: rgba(100, 65, 165, 0.2);
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        #filePreviewContainer {
+            display: none;
+            flex-wrap: wrap;
+            padding: 5px;
+            margin-bottom: 5px;
+            border-radius: 10px;
+            background-color: #1f1f1f;
+        }
+
+        #filePreviewContainer.visible {
+            display: flex;
+        }
+
+        .file-preview {
+            position: relative;
+            margin-right: 10px;
+            margin-bottom: 5px;
+        }
+
+        .file-preview img {
+            max-width: 100px;
+            max-height: 100px;
+            border-radius: 8px;
+        }
+
+        .file-preview .file-name {
+            display: block;
+            font-size: 0.8rem;
+            color: #8e8e93;
+            max-width: 100px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            margin-top: 5px;
+        }
+
+        .file-preview .remove-file {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #b20087;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .color-background-effect {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 300px;
+            background: radial-gradient(
+                circle at 50% 120%, 
+  rgba(255, 0, 255, 1) 0%,   /* Magenta */
+  rgba(142, 45, 226, 1) 50%,  /* Viola */
+  rgba(0, 191, 255, 1) 100%   /* Azzurro */
+);
+                transparent 100%
+            );
+            filter: blur(80px);
+            z-index: -1;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 3s ease-in-out;
+        }
+
+        .color-background-effect.fade-in {
+            opacity: 1;
+        }
+
+        header {
+            padding: 10px 15px;
+            text-align: center;
+            background-color: #000;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 60px;
+            box-sizing: border-box;
+            border-bottom: 1px solid #1a1a1a;
+            position: relative;
+        }
+
+        header .left-section,
+        header .right-section {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        header .back-arrow {
+            font-size: 1.8rem;
+            color: #fff;
+            cursor: pointer;
+            margin-right: 5px;
+        }
+
+        header .center-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex-grow: 1;
+            position: relative;
+        }
+
+        header .main-title {
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        header .dropdown {
+            display: flex;
+            align-items: center;
+            background: #1f1f1f;
+            border-radius: 12px;
+            padding: 4px 10px;
+            color: #8e8e93;
+            font-size: 0.8rem;
+            cursor: pointer;
+            margin-top: 2px;
+        }
+
+        header .dropdown .material-icons {
+            font-size: 1rem;
+            margin-left: 4px;
+        }
+
+        header .profile-pic {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-left: 5px;
+        }
+
+        #menuButton {
+            display: none;
+        }
+
+        #modelDropdown {
+            position: absolute;
+            top: calc(100% + 5px);
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #262626;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            padding: 8px 0;
+            min-width: 180px;
+            z-index: 100;
+            display: none;
+            text-align: left;
+        }
+
+        #modelDropdown.active {
+            display: block;
+        }
+
+        #modelDropdown p {
+            color: #8e8e93;
+            font-size: 0.85rem;
+            padding: 5px 15px;
+            margin: 0;
+            border-bottom: 1px solid #333;
+        }
+
+        #modelDropdown ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        #modelDropdown li {
+            padding: 10px 15px;
+            font-size: 0.95rem;
+            cursor: pointer;
+            color: #e2e2e2;
+            transition: background-color 0.2s ease;
+        }
+
+        #modelDropdown li:hover {
+            background-color: #333;
+        }
+
+        #sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 280px;
+            height: 100%;
+            background: #000;
+            border-right: 1px solid #1a1a1a;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            z-index: 999;
+            overflow-y: auto;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #sidebar.active {
+            transform: translateX(0);
+        }
+
+        .sidebar-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 20px;
+            margin: 10px auto 5px;
+            background: #b20087;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            box-sizing: border-box;
+            text-align: center;
+            transition: background 0.2s ease;
+            gap: 8px;
+            min-width: 180px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-decoration: none;
+        }
+
+        .sidebar-button:hover {
+            background: #9a0075;
+        }
+
+        .sidebar-button .material-symbols-outlined {
+            font-size: 20px;
+        }
+
+        #chatList {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            flex-grow: 1;
+            margin-top: 10px;
+        }
+
+        #sidebar li {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid #1a1a1a;
+            cursor: pointer;
+            color: #e2e2e2;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            position: relative;
+            transition: background 0.2s ease;
+        }
+
+        #sidebar li:hover {
+            background: #1a1a1a;
+        }
+
+        #sidebar li.active {
+            background-color: #262626;
+        }
+
+        #sidebar li .chat-title-text {
+            flex-grow: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            padding-bottom: 80px;
+        }
+
+        .message-block {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message-label {
+            font-size: 0.8rem;
+            color: #8e8e93;
+            margin-bottom: 4px;
+            padding-left: 5px;
+        }
+
+        .message-block.user-block .message-label {
+            align-self: flex-end;
+            margin-right: 5px;
+        }
+
+        .message-block.bot-block .message-label {
+            align-self: flex-start;
+            margin-left: 5px;
+        }
+
+        .message {
+            max-width: 70%;
+            padding: 10px 15px;
+            border-radius: 18px;
+            line-height: 1.4;
+            white-space: pre-wrap;
+            word-break: break-word;
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        .user {
+            align-self: flex-end;
+            background: #262626;
+            color: #fff;
+            border-radius: 18px;
+            margin-right: 5px;
+        }
+
+        .bot {
+            align-self: flex-start;
+            background: #262626;
+            color: #e2e2e2;
+            border-radius: 18px;
+            margin-left: 5px;
+        }
+
+        @keyframes fadeInSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.animate {
+            animation: fadeInSlideUp 0.3s ease-out forwards;
+        }
+
+        .welcome-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: #fff;
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background-color: transparent;
+        }
+
+        .welcome-container h1 {
+            font-size: 2.2rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .welcome-container p {
+            font-size: 1.1rem;
+            color: #ffffff;
+        }
+
+        .input-area {
+            display: flex;
+            flex-direction: column;
+            padding: 8px 15px;
+            background: #000;
+            gap: 10px;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            box-sizing: border-box;
+            border-top: 1px solid #1a1a1a;
+        }
+
+        .input-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .input-controls input {
+            flex: 1;
+            padding: 12px 15px;
+            font-size: 0.95rem;
+            border-radius: 25px;
+            border: none;
+            background: #1f1f1f;
+            color: #fff;
+            margin-right: 0;
+            outline: none;
+        }
+
+        .input-controls .icon-button {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1.6rem;
+            cursor: pointer;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            transition: 0.1s;
+        }
+
+        .input-controls .icon-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .input-controls .icon-button.highlight {
+            background: #00ff7f;
+            color: #000;
+        }
+       
+        .copy-button {
+            background-color: #333;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 8px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            margin-top: 5px;
+            align-self: flex-start;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: background-color 0.2s ease;
+        }
+
+        .copy-button:hover {
+            background-color: #555;
+        }
+
+        .copy-button .material-icons {
+            font-size: 1rem;
+        }
+
+        .whatsapp-popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .whatsapp-popup-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .whatsapp-popup {
+            background-color: #262626;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            max-width: 350px;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .whatsapp-popup-overlay.show .whatsapp-popup {
+            transform: scale(1);
+        }
+
+        .whatsapp-popup h2 {
+            color: #fff;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .whatsapp-popup p {
+            color: #e2e2e2;
+            font-size: 1rem;
+            line-height: 1.5;
+            margin-bottom: 25px;
+        }
+
+        .whatsapp-popup-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .whatsapp-popup-buttons button,
+        .whatsapp-popup-buttons a {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.2s ease;
+        }
+
+        .whatsapp-popup-buttons .close-button {
+            background-color: #333;
+            color: #e2e2e2;
+        }
+
+        .whatsapp-popup-buttons .close-button:hover {
+            background-color: #555;
+        }
+
+        .whatsapp-popup-buttons .join-button {
+            background-color: #25d366;
+            color: #fff;
+        }
+
+        .whatsapp-popup-buttons .join-button:hover {
+            background-color: #1da851;
+        }
+
+        @media (max-width: 600px) {
+            .message {
+                max-width: 85%;
+            }
+            header .main-title {
+                font-size: 1rem;
+            }
+            header .dropdown {
+                font-size: 0.7rem;
+            }
+            header .profile-pic {
+                width: 28px;
+                height: 28px;
+            }
+            .whatsapp-popup {
+                margin: 0 15px;
+                padding: 20px;
+            }
+            .whatsapp-popup h2 {
+                font-size: 1.3rem;
+            }
+            .whatsapp-popup p {
+                font-size: 0.9rem;
+            }
+            .whatsapp-popup-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="color-background-effect" id="colorBackgroundEffect"></div>
+
+    <div class="whatsapp-popup-overlay" id="whatsappPopupOverlay">
+        <div class="whatsapp-popup">
+            <h2>Abbiamo aperto il canale WhatsApp di Nyra!</h2>
+            <p>Unisciti per le news, sondaggi, anteprime e forse regali.. 👀</p>
+            <div class="whatsapp-popup-buttons">
+                <button class="close-button" onclick="closeWhatsappPopup()">Chiudi</button>
+                <a href="https://whatsapp.com/channel/0029Vb62kCUBvvsoDtruRy28" target="_blank" class="join-button">Unisciti</a>
+            </div>
+        </div>
+    </div>
+    <header>
+        <div class="left-section">
+            <i class="material-icons back-arrow" onclick="toggleSidebar()">keyboard_arrow_left</i>
+        </div>
+        <div class="center-section">
+            <div class="main-title">Nyra</div>
+            <div class="dropdown" id="modelDropdownToggle" onclick="toggleModelDropdown()">
+                <span id="selectedModelName">GPT 5 Nano</span> <i class="material-icons">keyboard_arrow_down</i>
+            </div>
+            <div id="modelDropdown">
+                <p>Scegli il tuo modello</p>
+                <ul>
+                    <li data-model="openai/gpt-5-nano" onclick="selectModel('GPT 5 Nano', 'openai/gpt-5-nano')">GPT 5 Nano</li>
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <div id="sidebar">
+        <a id="settingsLink" href="go:Settings" class="sidebar-button">
+            <span class="material-symbols-outlined">settings</span>
+            Impostazioni
+        </a>
+        <button id="newChatButton" onclick="newChat()" class="sidebar-button">
+            <span class="material-symbols-outlined">edit_square</span>
+            Nuova Chat
+        </button>
+        <ul id="chatList"></ul>
+    </div>
+
+    <div class="chat-container" id="chatContainer">
+        <div class="welcome-container" id="welcomeMessage">
+            <h1>GPT-5 su Nyra</h1>
+            <p>Ti presentiamo GPT-5 su Nyra, per<br>risposte rapide e intelligenti.</p>
+        </div>
+    </div>
+
+    <div class="input-area">
+        <div id="filePreviewContainer"></div>
+        <div class="input-controls">
+            <label for="fileInput" class="file-upload-label">
+                <i class="material-icons">attach_file</i>
+            </label>
+            <input type="file" id="fileInput" multiple accept="image/*,.txt,.csv,.md,.pdf">
+            <input type="text" id="userInput" placeholder="Invia un messaggio..." onkeydown=" if(event.key === 'Enter') sendMessage()">
+            <button id="sendButton" class="icon-button highlight" onclick="sendMessage()"><i class="material-icons">send</i></button>
+        </div>
+    </div>
+
+    <script>
+        let chats = [];
+        let currentChatIndex = 0;
+        let loadingMessageElement = null;
+        let currentModel = {
+            name: "GPT 5 nano",
+            id: "openai/gpt-5-nano"
+        };
+        let isProcessing = false;
+        let attachedFiles = [];
+
+        document.getElementById('fileInput').addEventListener('change', handleFileChange);
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+            closeAllDropdowns();
+        }
+
+        function toggleModelDropdown() {
+            document.getElementById('modelDropdown').classList.toggle('active');
+        }
+
+        function selectModel(modelName, modelId) {
+            currentModel.name = modelName;
+            currentModel.id = modelId;
+            document.getElementById('selectedModelName').textContent = modelName;
+            toggleModelDropdown();
+            console.log(`Modello selezionato: ${currentModel.name} (${currentModel.id})`);
+        }
+
+        function closeAllDropdowns(event) {
+            const sidebar = document.getElementById('sidebar');
+            const backArrow = document.querySelector('.back-arrow');
+            const modelDropdown = document.getElementById('modelDropdown');
+            const modelDropdownToggle = document.getElementById('modelDropdownToggle');
+            if (sidebar.classList.contains('active') && event && !sidebar.contains(event.target) && !backArrow.contains(event.target)) {
+                sidebar.classList.remove('active');
+            }
+
+            if (modelDropdown.classList.contains('active') && event && !modelDropdown.contains(event.target) && !modelDropdownToggle.contains(event.target)) {
+                modelDropdown.classList.remove('active');
+            }
+        }
+
+        document.addEventListener('click', closeAllDropdowns);
+        function saveChats() {
+            localStorage.setItem("nyraChats", JSON.stringify(chats));
+            localStorage.setItem("nyraCurrentModel", JSON.stringify(currentModel));
+        }
+
+        function loadChats() {
+            const savedChats = localStorage.getItem("nyraChats");
+            const savedModel = localStorage.getItem("nyraCurrentModel");
+
+            if (savedChats) {
+                chats = JSON.parse(savedChats);
+            } else {
+                chats = [];
+            }
+            
+            currentChatIndex = 0;
+            if (savedModel) {
+                currentModel = JSON.parse(savedModel);
+                document.getElementById('selectedModelName').textContent = currentModel.name;
+            } else {
+                currentModel = {
+                    name: "GPT 5 Nano",
+                    id: "openai/gpt-5-nano"
+                };
+                document.getElementById('selectedModelName').textContent = currentModel.name;
+            }
+
+            newChat(false);
+        }
+
+        function updateChatList() {
+            const list = document.getElementById('chatList');
+            list.innerHTML = '';
+
+            const sortedChats = [...chats].sort((a, b) => {
+                const aPinned = a.isPinned || false;
+                const bPinned = b.isPinned || false;
+                return bPinned - aPinned;
+            });
+            sortedChats.forEach((chat, index) => {
+                const originalIndex = chats.indexOf(chat);
+                const firstUserMsg = Array.isArray(chat) ? chat.find(msg => msg.role === 'user') : null;
+                const chatTitle = firstUserMsg ? firstUserMsg.content.slice(0, 25) + (firstUserMsg.content.length > 25 ? '...' : '') : 'Nuova Chat';
+                
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <span class="chat-title-text">${chatTitle}</span>
+                `;
+                
+                li.onclick = () => {
+                    const currentActiveLi = document.querySelector('#chatList li.active');
+                    if (currentActiveLi) {
+                        currentActiveLi.classList.remove('active');
+                    }
+
+                    currentChatIndex = originalIndex;
+                    li.classList.add('active');
+                    renderCurrentChat();
+                    saveChats();
+                    toggleSidebar();
+                };
+                list.appendChild(li);
+            });
+        }
+
+        function newChat(closeSidebar = true) {
+            chats.unshift([]);
+            currentChatIndex = 0;
+            updateChatList();
+            renderCurrentChat();
+            saveChats();
+            if (closeSidebar) {
+                toggleSidebar();
+            }
+        }
+
+        function renderCurrentChat() {
+            const chatContainer = document.getElementById('chatContainer');
+            chatContainer.innerHTML = '';
+            const currentChat = chats[currentChatIndex];
+            
+            const welcomeMessageDiv = document.createElement('div');
+            welcomeMessageDiv.className = 'welcome-container';
+            welcomeMessageDiv.id = 'welcomeMessage';
+            welcomeMessageDiv.innerHTML = '<h1>GPT-5 su Nyra</h1><p>Ti presentiamo GPT-5 su Nyra, per<br>risposte rapide e intelligenti.</p>';
+            chatContainer.appendChild(welcomeMessageDiv);
+
+            if (currentChat && currentChat.length > 0) {
+                welcomeMessageDiv.style.display = 'none';
+                currentChat.forEach(msg => {
+                    appendMessage(msg.role, msg.content, false);
+                });
+            } else {
+                welcomeMessageDiv.style.display = 'flex';
+            }
+            scrollToBottom();
+        }
+
+        function createMessage(text) {
+    // Crea il blocco messaggio
+    const messageBlock = document.createElement('div');
+    messageBlock.className = 'message-block';
+
+    const messageDiv = document.createElement('div');
+    messageDiv.className = 'message';
+    messageDiv.innerText = text;
+    messageBlock.appendChild(messageDiv);
+
+    // Contenitore pulsanti
+    const actions = document.createElement('div');
+    actions.className = 'message-actions';
+    messageBlock.appendChild(actions);
+
+    // --- Bottone Copia ---
+    const copyBtn = document.createElement('button');
+    copyBtn.className = 'copy-btn';
+    copyBtn.innerHTML = '<i class="material-icons">content_copy</i> Copia';
+    copyBtn.onclick = () => {
+        navigator.clipboard.writeText(messageDiv.innerText)
+            .then(() => {
+                copyBtn.textContent = 'Copiato!';
+                setTimeout(() => {
+                    copyBtn.innerHTML = '<i class="material-icons">content_copy</i> Copia';
+                }, 2000);
+            })
+            .catch(err => console.error(err));
+    };
+    actions.appendChild(copyBtn);
+
+    // --- Bottone Segnala ---
+    const reportBtn = document.createElement('button');
+    reportBtn.className = 'report-btn';
+    reportBtn.innerHTML = '<i class="material-icons">report</i> Segnala';
+    reportBtn.onclick = () => {
+        if (!confirm("Vuoi davvero segnalare questo messaggio?")) return;
+
+        const payload = {
+            timestamp: new Date().toISOString(),
+            text: messageDiv.innerText
+        };
+
+        fetch("https://script.google.com/macros/s/AKfycbySFDnAMfiTOnn30GEITw1J4Iwf01o2oUDbcz6mYNCJWrAuS0-ZiFg6VTJDdsxYICb4nQ/exec", {
+            method: "POST",
+            body: JSON.stringify(payload),
+            headers: { "Content-Type": "application/json" }
+        })
+        .then(() => {
+            reportBtn.textContent = 'Segnalato!';
+            setTimeout(() => {
+                reportBtn.innerHTML = '<i class="material-icons">report</i> Segnala';
+            }, 2000);
+        })
+        .catch(err => alert("Errore invio segnalazione"));
+    };
+    actions.appendChild(reportBtn);
+
+    // Aggiungi il messaggio al container principale
+    const chatContainer = document.querySelector('#chat-container');
+    if (chatContainer) chatContainer.appendChild(messageBlock);
+}
+    
+        function appendMessage(role, content, scroll = true) {
+            const chat = document.getElementById('chatContainer');
+            const welcomeMessageDiv = document.getElementById('welcomeMessage');
+            if (welcomeMessageDiv) {
+                welcomeMessageDiv.style.display = 'none';
+            }
+
+            const messageBlock = document.createElement('div');
+            messageBlock.className = `message-block ${role}-block`;
+            const label = document.createElement('div');
+            label.className = 'message-label';
+            label.textContent = role === 'user' ? 'You' : 'Nyra';
+            messageBlock.appendChild(label);
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${role}`;
+            messageDiv.innerHTML = role === 'bot' ? marked.parse(content) : content;
+            if (scroll) {
+                messageDiv.classList.add('animate');
+            }
+
+            messageBlock.appendChild(messageDiv);
+            chat.appendChild(messageBlock);
+            if (role === 'bot' && content.trim() !== '🧠 Nyra sta pensando...') {
+                const copyButton = document.createElement('button');
+                copyButton.className = 'copy-button';
+                copyButton.innerHTML = '<i class="material-icons">content_copy</i> Copia';
+                copyButton.onclick = () => copyResponse(copyButton); 
+                messageBlock.appendChild(copyButton);
+            }
+
+            if (scroll) {
+                scrollToBottom();
+            }
+            return messageDiv;
+        }
+        
+        function scrollToBottom() {
+            const chat = document.getElementById('chatContainer');
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        function removeFile(file) {
+            attachedFiles = attachedFiles.filter(f => f !== file);
+            handleFileChange();
+        }
+        
+        function handleFileChange() {
+            const fileInput = document.getElementById('fileInput');
+            const newFiles = Array.from(fileInput.files);
+            attachedFiles = newFiles.slice(0, 10);
+            
+            const previewContainer = document.getElementById('filePreviewContainer');
+            previewContainer.innerHTML = '';
+            if (attachedFiles.length > 0) {
+                previewContainer.classList.add('visible');
+                attachedFiles.forEach(file => {
+                    const previewDiv = document.createElement('div');
+                    previewDiv.className = 'file-preview';
+                    
+                    const removeButton = document.createElement('button');
+                    removeButton.className = 'remove-file';
+                    removeButton.textContent = 'x';
+                    removeButton.onclick = (event) => {
+                        event.stopPropagation();
+                        removeFile(file);
+                    };
+                    
+                    if (file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = e => {
+                            const img = document.createElement('img');
+                            img.src = e.target.result;
+                            previewDiv.appendChild(img);
+                            previewDiv.appendChild(removeButton);
+                            previewContainer.appendChild(previewDiv);
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        const fileInfo = document.createElement('span');
+                        fileInfo.className = 'file-name';
+                        fileInfo.textContent = file.name;
+                        previewDiv.appendChild(fileInfo);
+                        previewDiv.appendChild(removeButton);
+                        previewContainer.appendChild(previewDiv);
+                    }
+                });
+            } else {
+                previewContainer.classList.remove('visible');
+            }
+        }
+    
+        function setInputEnabled(enabled) {
+            const input = document.getElementById('userInput');
+            const sendButton = document.getElementById('sendButton');
+            const fileInput = document.getElementById('fileInput');
+
+            input.disabled = !enabled;
+            sendButton.disabled = !enabled;
+            fileInput.disabled = !enabled;
+            if (enabled) {
+                sendButton.classList.add('highlight');
+            } else {
+                sendButton.classList.remove('highlight');
+            }
+        }
+        
+        async function sendMessage() {
+            if (isProcessing) return;
+
+            const input = document.getElementById('userInput');
+            const message = input.value.trim();
+            const files = [...attachedFiles];
+            
+            if (!message && files.length === 0) return;
+            
+            isProcessing = true;
+            setInputEnabled(false);
+            
+            let userContentHtml = message;
+            if (files.length > 0) {
+                const filePreviews = files.map(file => {
+                    const icon = file.type.startsWith('image/') ? '🖼️' : '📄';
+                    return `<p style="margin: 2px 0; font-size: 0.9em;">${icon} Allegato: ${file.name}</p>`;
+                }).join('');
+                userContentHtml = `${message ? message + '<br>' : ''}${filePreviews}`;
+            }
+
+            appendMessage('user', userContentHtml);
+            chats[currentChatIndex].push({ role: 'user', content: message }); 
+
+            input.value = '';
+            document.getElementById('fileInput').value = '';
+            attachedFiles = [];
+            document.getElementById('filePreviewContainer').classList.remove('visible');
+            loadingMessageElement = appendMessage('bot', '🧠 Nyra sta pensando...');
+            scrollToBottom();
+
+            try {
+                // ========= INIZIO LOGICA FINALE E CORRETTA =========
+
+                // 1. Prepara il contenuto del NUOVO messaggio utente nel suo formato complesso
+                let newUserMessageContent = [];
+                if (message) {
+                    newUserMessageContent.push({ type: "text", text: message });
+                }
+                
+                for (const file of files) {
+                    const isTextFile = file.type.startsWith('text/') || file.name.endsWith('.md') || file.name.endsWith('.csv') || file.name.endsWith('.txt');
+                    const isSupportedImage = file.type.startsWith('image/');
+                    const isPdf = file.type === 'application/pdf';
+
+                    if (isTextFile) {
+                        const textContent = await new Promise((resolve, reject) => {
+                            const reader = new FileReader();
+                            reader.onload = () => resolve(reader.result);
+                            reader.onerror = error => reject(error);
+                            reader.readAsText(file, 'UTF-8');
+                        });
+                        newUserMessageContent.push({
+                            type: "text",
+                            text: `--- Inizio del contenuto del file ${file.name} ---\n\n${textContent}\n\n--- Fine del contenuto del file ${file.name} ---`
+                        });
+                    } else if (isSupportedImage || isPdf) {
+                         const base64Content = await new Promise((resolve, reject) => {
+                            const reader = new FileReader();
+                            reader.onload = () => resolve(reader.result);
+                            reader.onerror = error => reject(error);
+                            reader.readAsDataURL(file);
+                        });
+                        newUserMessageContent.push({
+                            type: "image_url",
+                            image_url: { url: base64Content }
+                        });
+                    }
+                }
+
+                // 2. Prendi la cronologia ESISTENTE
+                const historyToTransform = chats[currentChatIndex].slice(0, -1);
+
+                // 3. Trasforma la cronologia rispettando il formato specifico di ogni ruolo
+                const transformedHistory = historyToTransform.map(msg => {
+                    if (msg.role === 'user') {
+                        // I messaggi UTENTE vengono messi nel formato complesso
+                        return {
+                            role: msg.role,
+                            content: [{ type: 'text', text: msg.content }]
+                        };
+                    } else { // msg.role === 'bot'
+                        // I messaggi BOT vengono lasciati nel formato semplice (stringa)
+                        return msg;
+                    }
+                });
+
+                // 4. Costruisci il payload finale da inviare all'API
+                const finalMessages = [
+                    {
+                        role: "system",
+                        content: "Sei Nyra, un assistente virtuale sviluppato Aura. La tua lingua principale è l'italiano."
+                    },
+                    ...transformedHistory,
+                    {
+                        role: "user",
+                        content: newUserMessageContent
+                    }
+                ];
+                
+                // ========= FINE LOGICA FINALE E CORRETTA =========
+
+                const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+                    method: "POST",
+                    headers: {
+                        "Authorization": "Bearer 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",
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        "model": currentModel.id,
+                        "messages": finalMessages,
+                        "temperature": 0.7
+                    })
+                });
+                
+                const data = await res.json();
+                
+                if (!res.ok) {
+                    const errorMessage = data.error?.message || JSON.stringify(data);
+                    console.error('Errore HTTP dalla API:', res.status, data);
+                    throw new Error(`Errore API: ${res.status} - ${errorMessage}`);
+                }
+
+                const botMessage = data.choices[0]?.message?.content?.trim() || "Errore: Risposta non valida dalla AI.";
+                
+                if (loadingMessageElement) {
+                    loadingMessageElement.innerHTML = marked.parse(botMessage);
+                    const messageBlockOfLoading = loadingMessageElement.closest('.message-block');
+                    if (messageBlockOfLoading) {
+                        const copyButton = document.createElement('button');
+                        copyButton.className = 'copy-button';
+                        copyButton.innerHTML = '<i class="material-icons">content_copy</i> Copia';
+                        copyButton.onclick = () => copyResponse(copyButton);
+                        messageBlockOfLoading.appendChild(copyButton);
+                    }
+                }
+
+                chats[currentChatIndex].push({ role: 'assistant', content: botMessage });
+                scrollToBottom();
+                saveChats();
+                updateChatList();
+
+            } catch (error) {
+                console.error('Errore durante la richiesta API:', error);
+                if (loadingMessageElement) {
+                    loadingMessageElement.textContent = `Errore: Impossibile ottenere risposta. (${error.message || 'Errore sconosciuto'})`;
+                }
+                chats[currentChatIndex].pop();
+                saveChats();
+
+            } finally {
+                loadingMessageElement = null;
+                isProcessing = false;
+                setInputEnabled(true);
+            }
+        }
+
+
+        function startBackgroundFadeIn() {
+            const effectElement = document.getElementById('colorBackgroundEffect');
+            if (effectElement) {
+                effectElement.classList.add('fade-in');
+            }
+        }
+
+        function showWhatsappPopup() {
+            const popupOverlay = document.getElementById('whatsappPopupOverlay');
+            popupOverlay.classList.add('show');
+        }
+
+        function closeWhatsappPopup() {
+            const popupOverlay = document.getElementById('whatsappPopupOverlay');
+            popupOverlay.classList.remove('show');
+            localStorage.setItem('nyraWhatsappPopupShown', 'true');
+        }
+
+        window.onload = () => {
+            loadChats();
+            startBackgroundFadeIn();
+            if (!localStorage.getItem('nyraWhatsappPopupShown')) {
+                showWhatsappPopup();
+            }
+        };
+    </script>
+</body>
+</html>
