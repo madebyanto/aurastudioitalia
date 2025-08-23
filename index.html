@@ -48,17 +48,17 @@
             </div>
         </section>
 
-        <section id="why-aura" class="why-aura">
-            <div class="container two-columns">
-                <div class="why-aura-content">
-                    <h2>Perché <span class="highlight">Aura</span></h2>
-                    <p>Siamo un gruppo di ragazzi appassionati. Con Aura, puntiamo a creare <span class="highlight">software e app</span> che possano aiutarvi con la vita quotidiana e a far parte della nostra community.</p>
-                </div>
-                <div class="why-aura-visual">
-                    <img src="aura-grafic-1.png" alt="Icona Perché Aura">
-                </div>
-            </div>
-        </section>
+       <section id="why-aura" class="why-aura">
+    <div class="container two-columns">
+        <div class="why-aura-content">
+            <h2>Perché <span class="highlight">Aura</span></h2>
+            <p>Siamo un gruppo di ragazzi appassionati. Con Aura, puntiamo a creare <span class="highlight">software e app</span> che possano aiutarvi con la vita quotidiana e a far parte della nostra community.</p>
+        </div>
+        <div class="why-aura-visual">
+            <img src="aura-grafic-1.png" alt="Icona Perché Aura">
+        </div>
+    </div>
+</section>
 
         <section class="services">
             <div class="container">
@@ -91,25 +91,25 @@
             </div>
         </section>
         
-        <section class="stay-in">
-             <div class="container two-columns">
-                <div class="stay-in-image">
-                    <img src="aura-grafic-2.png" alt="Anteprima chat Aura">
-                </div>
-                <div class="stay-in-content">
-                    <h2>Stay <span class="highlight">in</span> 🔥</h2>
-                    <p>Entra nei canale WhatsApp anonimo per news, esclusive e sfide legate al mondo di Aura!</p>
-                    <a href="https://whatsapp.com/channel/0029VanxEbwL2AU4MyDa1x1n" class="btn btn-primary unisciti-btn">Unisciti</a>
-                </div>
-            </div>
-        </section>
+       <section class="stay-in">
+    <div class="container two-columns reverse">
+        <div class="stay-in-image">
+            <img src="aura-grafic-2.png" alt="Anteprima chat Aura">
+        </div>
+        <div class="stay-in-content">
+            <h2>Stay <span class="highlight">in</span> 🔥</h2>
+            <p>Entra nel canale WhatsApp anonimo per news, esclusive e sfide legate al mondo di Aura!</p>
+            <a href="https://whatsapp.com/channel/0029VanxEbwL2AU4MyDa1x1n" class="btn btn-primary unisciti-btn">Unisciti</a>
+        </div>
+    </div>
+</section>
     </main>
 
     <footer>
         <div class="container">
             <h2>Seguici sui social!</h2>
             <div class="social-icons">
-                 <a href="#" class="social-icon"><i class="fa-brands fa-discord"></i></a>
+  <a href="https://discord.gg/tctmBsMnfk" class="social-icon"><i class="fa-brands fa-discord"></i></a>
   <a href="https://tiktok.com/@aurastudio.italia" class="social-icon"><i class="fa-brands fa-tiktok"></i></a>
   <a href="https://instagram.com/@aurastudio.italia" class="social-icon"><i class="fa-brands fa-instagram"></i></a>
   <a href="https://youtube.com/@aurastudio.italia" class="social-icon"><i class="fa-brands fa-youtube"></i></a>
@@ -423,6 +423,47 @@ footer { padding: 40px 0; text-align: center; }
     background: #F05BFF;
     transform: scale(1.1);
   }
+
+/* Classe per invertire le colonne solo su desktop */
+.two-columns.reverse {
+    flex-direction: column-reverse; /* rimane verticale su mobile */
+}
+
+@media (min-width: 768px) {
+    .two-columns {
+        flex-direction: row; /* affianca le colonne */
+        align-items: center;
+        text-align: left;
+    }
+
+    /* Inverte le colonne solo se c'è classe reverse */
+    .two-columns.reverse {
+        flex-direction: row; /* immagine a sinistra, testo a destra */
+    }
+
+    /* Dimensione immagini grandi e proporzionate */
+    .why-aura-visual img,
+    .stay-in-image img {
+        max-width: 100%;  /* occupa tutta la colonna */
+        height: auto;
+        border-radius: 20px;
+    }
+
+    /* Centrare immagini nella colonna */
+    .why-aura-visual,
+    .stay-in-image {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    /* Colonna testo equilibrata */
+    .why-aura-content,
+    .stay-in-content {
+        flex: 1;
+    }
+}
   </style>
     <script>
   document.addEventListener('DOMContentLoaded', function() {
