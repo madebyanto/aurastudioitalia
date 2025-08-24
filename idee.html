@@ -1,162 +1,285 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Le nostre idee - Aura Studio</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Progetti</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+  :root {
+    --gradient-start: #E30AF5;
+    --gradient-end: #F174FF;
+    --text-color: #fff;
+  }
 
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #E30AF5, #F174FF);
-            color: #fff;
-            text-align: center;
-            padding: 20px;
-        }
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
 
-        .container {
-            max-width: 700px;
-            margin: 0 auto;
-        }
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #E30AF5, #F174FF);
+    color: #fff;
+  }
 
-        header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            font-weight: 600;
-            animation: fadeIn 1s ease-in-out;
-        }
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 120px 20px 60px;
+    text-align: center;
+  }
 
-        header p {
-            font-size: 1.2em;
-            font-weight: 300;
-            margin-bottom: 30px;
-            animation: fadeIn 1.2s ease-in-out;
-        }
+  header h1 {
+    font-size: 2.5em;
+    margin-bottom: 10px;
+    font-weight: 600;
+    animation: fadeIn 1s ease-in-out;
+  }
 
-        .buttons {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
-        }
+  header p {
+    font-size: 1.2em;
+    font-weight: 300;
+    margin-bottom: 30px;
+    animation: fadeIn 1.2s ease-in-out;
+  }
 
-        .widget {
-            background: rgba(255, 255, 255, 0.2);
-            color: #fff;
-            padding: 20px;
-            border-radius: 15px;
-            text-align: left;
-            cursor: pointer;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            border: none;
-            display: flex;
-            align-items: center;
-        }
+  .projects {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    justify-items: center;
+  }
 
-        .widget:hover {
-            transform: translateY(-5px);
-            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
-        }
+  .card {
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 20px;
+    padding: 30px;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    max-width: 300px;
+  }
 
-        .widget::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.3);
-            transition: left 0.4s ease;
-        }
+  .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.3);
+  }
 
-        .widget:hover::after {
-            left: 100%;
-        }
+  .card img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    margin-bottom: 15px;
+    border-radius: 12px;
+  }
 
-        .widget img {
-            width: 50px;
-            height: 50px;
-            object-fit: contain;
-            margin-right: 15px;
-            border-radius: 10px;
-        }
+  .card h2 {
+    font-size: 1.4em;
+    margin-bottom: 10px;
+    font-weight: 600;
+  }
 
-        .widget-content h2 {
-            font-size: 1.5em;
-            margin-bottom: 5px;
-            font-weight: 600;
-        }
+  .card p {
+    font-size: 1em;
+    font-weight: 300;
+    margin-bottom: 15px;
+  }
 
-        .widget-content p {
-            font-size: 1em;
-            font-weight: 300;
-        }
+  .card a {
+    display: inline-block;
+    padding: 10px 20px;
+    background: #fff;
+    color: #E30AF5;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: background 0.3s, color 0.3s;
+  }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-    </style>
+  .card a:hover {
+    background: #E30AF5;
+    color: #fff;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .sidebar {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 75%;
+    max-width: 400px;
+    height: 100%;
+    background-image: linear-gradient(to bottom right, var(--gradient-start), var(--gradient-end));
+    box-shadow: -5px 0 15px rgba(0,0,0,0.2);
+    transition: right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    padding: 30px;
+    z-index: 1001;
+  }
+
+  .sidebar.open { right: 0; }
+  .close-menu-btn {
+    position: absolute;
+    top: 20px;
+    right: 25px;
+    background: none;
+    border: none;
+    color: var(--text-color);
+    font-size: 40px;
+    font-weight: 300;
+    cursor: pointer;
+  }
+
+  .sidebar ul { list-style: none; margin-top: 80px; }
+  .sidebar ul li a {
+    color: var(--text-color);
+    text-decoration: none;
+    font-size: 1.2rem;
+    font-weight: 600;
+    display: block;
+    padding: 15px 0;
+  }
+
+  .sidebar ul li a img {
+    width: 18px;
+    height: 18px;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+
+  .main-header {
+    display: flex;
+    position: fixed;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 25px;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
+    background-color: rgba(240, 91, 255, 0.4);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .logo img {
+    max-height: 50px;
+    width: auto;
+    display: block;
+    border-radius: 50%;
+  }
+
+  .menu-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .menu-btn span {
+    display: block;
+    width: 30px;
+    height: 3px;
+    background-color: var(--text-color);
+    border-radius: 3px;
+  }
+
+  </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Le nostre idee</h1>
-            <p>Progetti e sogni che stiamo trasformando in realtà 💡</p>
-        </header>
-
-<h2>In evidenza 🔥</h2>
-        <div class="buttons">
-            <div class="widget">
-                <img src="auracommunity.png" alt="Aura Community">
-                <div class="widget-content">
-                    <h2>Aura Community</h2>
-                    <p>La nostra community WhatsApp di utenti e fan.</p>
-                </div>
-            </div>
-
-            <div class="widget">
-                <img src="auraplus.png" alt="Aura+">
-                <div class="widget-content">
-                    <h2>Aura+</h2>
-                    <p>L'app ufficiale con contenuti e servizi esclusivi. Scaricala su Aura Store!</p>
-                </div>
-            </div>
-
-            <div class="widget">
-                <img src="nyra.png" alt="Nyra">
-                <div class="widget-content">
-                    <h2>Nyra</h2>
-                    <p>Un'intelligenza artificiale in sviluppo capace di comprendere e fornire supporto.</p>
-                </div>
-            </div>
-
-<h3>Altro</h3>
-            <div class="widget">
-                <img src="italianmodbot.png" alt="ItalianModerationsBOT">
-                <div class="widget-content">
-                    <h2>ItalianModerationsBOT</h2>
-                    <p>Bot di moderazione pensato per i server Discord italiani.</p>
-                </div>
-            </div>
-
-            <div class="widget">
-                <img src="aurastore.png" alt="Aura Store">
-                <div class="widget-content">
-                    <h2>Aura Store</h2>
-                    <p>Scarica i nostri software ufficiali gratuitamente.</p>
-                </div>
-            </div>
-
-          
+   <header class="main-header">
+        <div class="logo">
+            <img src="auraplus.png" alt="Aura Logo">
         </div>
+        <button id="open-menu" class="menu-btn" aria-label="Apri menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+   </header>
+
+  <nav id="sidebar" class="sidebar">
+        <button id="close-menu" class="close-menu-btn" aria-label="Chiudi menu">&times;</button>
+        <ul>
+            <li><a href="https://os.aurastudioitalia.it"><img src="account.svg" alt="Account"> Accedi o registrati</a></li>
+            <li><a href="https://github.com/madebyanto/aurastudioitalia/releases/download/aura/terminilegali.pdf"><img src="legal.svg" alt="Legal"> Marchio protetto</a></li>
+            <li><a href="https://privacy.aurastudioitalia.it"><img src="privacy.svg" alt="Privacy"> Centro privacy</a></li>
+            <li><a href="https://support.aurastudioitalia.it"><img src="support.svg" alt="Support"> Contattaci</a></li>
+            <li><a href="idee.html"><img src="services.svg" alt="Services"> I nostri servizi</a></li>
+        </ul>
+  </nav>
+
+  <div class="container">
+    <header>
+      <h1>Servizi</h1>
+      <p>Lista di tutti i servizi di Aura.<br>Puoi facilmente visitarli cliccando Esplora.</p>
+    </header>
+
+    <div class="projects">
+      <div class="card">
+        <img src="community.png" alt="Aura Community">
+        <h2>Aura Community</h2>
+        <p>La nostra community WhatsApp di utenti e fan.</p>
+        <a href="community.html">Esplora</a>
+      </div>
+
+      <div class="card">
+        <img src="auraplus.png" alt="Aura+">
+        <h2>Aura+</h2>
+        <p>L'app ufficiale con contenuti e servizi esclusivi. Scaricala su Aura Store!</p>
+        <a href="https://play.google.com/store/apps/details?id=www.aurastudioitalia.it">Esplora</a>
+      </div>
+
+      <div class="card">
+        <img src="nyra.png" alt="Nyra">
+        <h2>Nyra</h2>
+        <p>Un'intelligenza artificiale basata su GPT-5 capace di comprendere e fornire supporto.</p>
+        <a href="https://play.google.com/store/apps/details?id=com.nyra.it">Esplora</a>
+      </div>
+
+      <div class="card">
+        <img src="italianmodbot.png" alt="ItalianModerationsBOT">
+        <h2>ItalianModerationsBOT</h2>
+        <p>Bot di moderazione pensato per i server Discord italiani.</p>
+        <a href="https://imb.aurastudioitalia.it">Esplora</a>
+      </div>
+
+      <div class="card">
+        <img src="aurastore.png" alt="Aura Store">
+        <h2>Aura Store</h2>
+        <p>Scarica i nostri software ufficiali gratuitamente.</p>
+        <a href="https://store.aurastudioitalia.it">Esplora</a>
+      </div>
+
+      <div class="card">
+        <img src="aurachat.png" alt="Aura Chat">
+        <h2>Aura Chat</h2>
+        <p>La nostra applicazione di messaggistica semplice, personale e sicura.</p>
+        <a href="#">In sviluppo</a>
+      </div>
     </div>
+  </div>
+
+  <script>
+    const sidebar = document.getElementById("sidebar");
+    const openBtn = document.getElementById("open-menu");
+    const closeBtn = document.getElementById("close-menu");
+
+    openBtn.addEventListener("click", () => {
+      sidebar.classList.add("open");
+    });
+
+    closeBtn.addEventListener("click", () => {
+      sidebar.classList.remove("open");
+    });
+  </script>
 </body>
 </html>
