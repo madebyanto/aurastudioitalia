@@ -1,72 +1,72 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aura | Offline</title>
-    <style>
-        /* Stile Aura */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aura Offline</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: #0d0d0d;
+      color: #fff;
+      font-family: "Segoe UI", sans-serif;
+      text-align: center;
+    }
 
-        body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #6b5bfc, #fc6b9b);
-            color: #fff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            text-align: center;
-        }
+    .emoji {
+      font-size: 5rem;
+      margin-bottom: 20px;
+      animation: bounce 1.5s infinite;
+    }
 
-        .offline-container {
-            background: rgba(0,0,0,0.4);
-            padding: 40px 30px;
-            border-radius: 20px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
-        }
+    h1 {
+      font-size: 1.6rem;
+      margin-bottom: 20px;
+      opacity: 0.9;
+    }
 
-        h1 {
-            font-size: 2.5em;
-            margin-bottom: 15px;
-        }
+    a {
+      display: inline-block;
+      padding: 12px 24px;
+      background: #F05BFF;
+      color: white;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: 0.3s;
+      cursor: pointer;
+    }
 
-        p {
-            font-size: 1.2em;
-            margin-bottom: 30px;
-        }
+    a:hover {
+      background: #c044cc;
+      transform: scale(1.05);
+    }
 
-        button {
-            padding: 12px 30px;
-            font-size: 1em;
-            font-weight: 600;
-            color: #6b5bfc;
-            background: #fff;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        button:hover {
-            background: #f0f0f0;
-        }
-    </style>
+    @keyframes bounce {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="offline-container">
-        <h1>😵 Sei offline</h1>
-        <p>Controlla la tua connessione a Internet e riprova.</p>
-        <button onclick="retry()">Riprova</button>
-    </div>
+  <div class="emoji">😵</div>
+  <h1>Ops... sembra che tu sia offline!</h1>
+  <a onclick="retry()">Riprova</a>
 
-    <script>
-        function retry() {
-            // Prova a ricaricare index.html
-            window.location.href = '/index.html';
-        }
-    </script>
+  <script>
+    function retry() {
+      // Prova a ricaricare index.html
+      window.location.href = '/index.html';
+    }
+  </script>
 </body>
 </html>
