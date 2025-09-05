@@ -488,6 +488,14 @@ footer { padding: 40px 0; text-align: center; }
     closeMenuBtn.addEventListener('click', closeSidebar);
 });
 
+
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js')
+            .then(reg => console.log('Service Worker registrato:', reg.scope))
+            .catch(err => console.log('Service Worker fallito:', err));
+    });
+}
   </script>
 </body>
     </html>
