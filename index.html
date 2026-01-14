@@ -101,21 +101,17 @@
             <h2>Stay <span class="highlight">in</span> 🔥</h2>
             <p>Entra nel canale WhatsApp anonimo e Telegram per news, esclusive e sfide legate al mondo di Aura!</p>
 
-            <!-- >>> Qui ho sostituito il singolo bottone "Unisciti" con due bottoni affiancati -->
             <div class="stay-in-buttons">
-                <!-- Usa il link WhatsApp che avevi prima -->
                 <a href="https://whatsapp.com/channel/0029VanxEbwL2AU4MyDa1x1n" class="stay-btn whatsapp" target="_blank" rel="noopener noreferrer" aria-label="Unisciti su WhatsApp">
                     <i class="fa-brands fa-whatsapp" aria-hidden="true"></i>
                     <span>WhatsApp</span>
                 </a>
 
-                <!-- Inserisci qui il link Telegram che preferisci (ho messo un'ipotesi) -->
                 <a href="https://t.me/aurastudioita" class="stay-btn telegram" target="_blank" rel="noopener noreferrer" aria-label="Unisciti su Telegram">
                     <i class="fa-brands fa-telegram" aria-hidden="true"></i>
                     <span>Telegram</span>
                 </a>
             </div>
-            <!-- <<< fine modifica -->
 
         </div>
     </div>
@@ -145,7 +141,6 @@
         </div>
     </footer>
   <style>
-  /* --- IMPOSTAZIONI GLOBALI E VARIABILI --- */
 :root {
     --gradient-start: #F3A6FE;
     --gradient-end: #F05BFF;
@@ -174,7 +169,6 @@ body {
     overflow-x: hidden;
 }
 
-/* --- CONTAINER PER CENTRATURA CONTENUTO --- */
 .container {
     width: 100%;
     max-width: 1000px;
@@ -182,8 +176,6 @@ body {
     padding: 0 25px;
 }
 
-
-/* --- HEADER FISSO CON BLUR --- */
 .main-header {
     display: flex;
     justify-content: space-between;
@@ -223,7 +215,6 @@ body {
     border-radius: 3px;
 }
 
-/* --- SIDEBAR --- */
 .sidebar {
     position: fixed;
     top: 0;
@@ -260,13 +251,12 @@ body {
 }
 
 .sidebar ul li a img {
-    width: 18px;        /* dimensione piccola delle icone */
+    width: 18px;       
     height: 18px;
-    margin-right: 8px;  /* spazio tra icona e testo */
+    margin-right: 8px; 
     vertical-align: middle;
 }
 
-/* --- STILI GENERALI PER IL CONTENUTO --- */
 main {
     padding-top: 40px; 
 }
@@ -283,13 +273,11 @@ h1 { font-size: 2.5rem; line-height: 1.2; margin-bottom: 20px; font-weight: 800;
 h2 { font-size: 2rem; margin-bottom: 15px; font-weight: 800; }
 p { font-size: 1rem; line-height: 1.6; }
 
-/* --- HIGHLIGHT COLOR --- */
 .highlight {
     color: #F05BFF;
     font-weight: 700;
 }
 
-/* --- BOTTONI --- */
 .hero-buttons {
     margin-top: 30px;
     display: flex;
@@ -327,7 +315,6 @@ p { font-size: 1rem; line-height: 1.6; }
 }
 
 
-/* --- LAYOUT A DUE COLONNE --- */
 .two-columns {
     display: flex;
     flex-direction: column;
@@ -337,8 +324,7 @@ p { font-size: 1rem; line-height: 1.6; }
 .two-columns > div {
     flex: 1;
 }
-
-/* Stili per le immagini/icone nelle sezioni */
+      
 .why-aura-visual img {
     max-width: 150px;
     border-radius: 20px;
@@ -350,14 +336,14 @@ p { font-size: 1rem; line-height: 1.6; }
 }
 
 
-/* --- SEZIONE SERVIZI (CARDS) --- */
+
 .card-grid {
     display: grid;
     grid-template-columns: 1fr;
     gap: 25px;
 }
 .card {
-    background-color: rgba(255, 255, 255, 0.3); /* NUOVO SFONDO CARD */
+    background-color: rgba(255, 255, 255, 0.3);
     border-radius: 20px;
     padding: 25px;
     text-align: center;
@@ -376,24 +362,22 @@ p { font-size: 1rem; line-height: 1.6; }
     margin-bottom: 10px;
 }
 .card-icon-container img {
-    width: 120px;       /* dimensione quadrata */
+    width: 120px;       
     height: 120px;
-    object-fit: cover; /* riempie tutto il quadrato senza deformarsi */
-    border-radius: 15px; /* angoli arrotondati */
+    object-fit: cover; 
+    border-radius: 15px; 
 }
 
-/* >>> STILI PER I NUOVI BOTTONI STAY-IN <<< */
 .stay-in-buttons {
     display: flex;
     gap: 12px;
     justify-content: center;
     align-items: center;
     margin-top: 18px;
-    flex-wrap: nowrap; /* importante: mantieni affiancati anche su mobile */
-}
+    flex-wrap: nowrap; 
 
 .stay-btn {
-    flex: 1 1 140px; /* crescere, ridursi, larghezza base */
+    flex: 1 1 140px;
     min-width: 120px;
     padding: 12px 16px;
     border-radius: 25px;
@@ -410,13 +394,11 @@ p { font-size: 1rem; line-height: 1.6; }
 
 .stay-btn .fa-brands { font-size: 1.2rem; }
 
-/* Colori ufficiali */
 .stay-btn.whatsapp { background-color: #25D366; color: #ffffff; }
 .stay-btn.telegram  { background-color: #0088cc; color: #ffffff; }
 
 .stay-btn:hover { transform: translateY(-3px); }
 
-/* --- FOOTER --- */
 footer { padding: 40px 0; text-align: center; }
 .social-icons { display: flex; justify-content: center; gap: 10px; margin: 20px 0; }
 .social-icon { width: 50px; height: 50px; background-color: var(--dark-bg); border-radius: 12px; display: flex; justify-content: center; align-items: center; text-decoration: none; color: var(--text-color); font-size: 1.5rem; font-weight: bold; }
@@ -425,35 +407,31 @@ footer { padding: 40px 0; text-align: center; }
 .footer-credit { margin-top: 30px; font-size: 0.9rem; line-height: 1.5; }
 
 
-/* --- RESPONSIVE DESIGN --- */
 @media (min-width: 768px) {
     section { padding: 60px 0; }
     h1 { font-size: 2.8rem; }
     h2 { font-size: 2.2rem; }
 
     .two-columns {
-        flex-direction: row; /* Colonne affiancate */
+        flex-direction: row;
         align-items: center;
         text-align: left;
     }
 
     .two-columns h2, .two-columns p {
-        text-align: left; /* Allinea il testo a sinistra nelle sezioni a 2 colonne */
+        text-align: left;
     }
 
     .card-grid {
-        grid-template-columns: repeat(3, 1fr); /* Griglia a tre colonne */
+        grid-template-columns: repeat(3, 1fr); 
     }
 }
 
-/* --- MOBILE-SPECIFIC: mantieni i due bottoni affiancati anche su mobile --- */
 @media (max-width: 767px) {
     section {
-        padding: 60px 0; /* più distacco tra le sezioni solo su mobile */
+        padding: 60px 0; 
     }
-    /* Se per qualche motivo esistesse ancora la vecchia classe, nascondila */
     .unisciti-btn { display: none; }
-    /* I bottoni stay-in rimangono affiancati grazie alla regola principale */
 }
 
   .social-icons {
@@ -470,7 +448,7 @@ footer { padding: 40px 0; text-align: center; }
     justify-content: center;
     align-items: center;
     background: #111;
-    border-radius: 10px; /* angoli arrotondati */
+    border-radius: 10px;
     color: white;
     font-size: 20px;
     transition: 0.3s;
@@ -482,32 +460,29 @@ footer { padding: 40px 0; text-align: center; }
     transform: scale(1.1);
   }
 
-/* Classe per invertire le colonne solo su desktop */
 .two-columns.reverse {
-    flex-direction: column-reverse; /* rimane verticale su mobile */
+    flex-direction: column-reverse;
 }
 
 @media (min-width: 768px) {
     .two-columns {
-        flex-direction: row; /* affianca le colonne */
+        flex-direction: row;
         align-items: center;
         text-align: left;
     }
 
-    /* Inverte le colonne solo se c'è classe reverse */
+    
     .two-columns.reverse {
-        flex-direction: row; /* immagine a sinistra, testo a destra */
+        flex-direction: row;
     }
 
-    /* Dimensione immagini grandi e proporzionate */
     .why-aura-visual img,
     .stay-in-image img {
-        max-width: 100%;  /* occupa tutta la colonna */
+        max-width: 100%; 
         height: auto;
         border-radius: 20px;
     }
 
-    /* Centrare immagini nella colonna */
     .why-aura-visual,
     .stay-in-image {
         flex: 1;
@@ -516,7 +491,6 @@ footer { padding: 40px 0; text-align: center; }
         align-items: center;
     }
 
-    /* Colonna testo equilibrata */
     .why-aura-content,
     .stay-in-content {
         flex: 1;
@@ -525,22 +499,18 @@ footer { padding: 40px 0; text-align: center; }
   </style>
     <script>
   document.addEventListener('DOMContentLoaded', function() {
-    // Seleziona gli elementi del DOM
     const sidebar = document.getElementById('sidebar');
     const openMenuBtn = document.getElementById('open-menu');
     const closeMenuBtn = document.getElementById('close-menu');
-
-    // Funzione per aprire la sidebar
+      
     function openSidebar() {
         sidebar.classList.add('open');
     }
-
-    // Funzione per chiudere la sidebar
+    
     function closeSidebar() {
         sidebar.classList.remove('open');
     }
-
-    // Aggiungi gli event listener ai pulsanti
+      
     openMenuBtn.addEventListener('click', openSidebar);
     closeMenuBtn.addEventListener('click', closeSidebar);
 });
@@ -572,7 +542,6 @@ function getGraphicsInfo() {
     }
 }
 
-// appena la pagina è caricata, aggiorno il <p>
 window.addEventListener("DOMContentLoaded", () => {
     document.getElementById("footer-credit").innerHTML += " " + getGraphicsInfo();
 });
