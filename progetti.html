@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura/Progetti</title>
+    <link rel="icon" type="image/png" href="images/aura.jpg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --card-bg: rgba(255, 255, 255, 0.7);
+            --text-main: #2d3436;
+            --text-muted: #636e72;
+            --accent: #F05BFF;
+            --accent-soft: rgba(240, 91, 255, 0.1);
+            --nav-bg: rgba(255, 255, 255, 0.8);
+            --border-color: rgba(0,0,0,0.05);
+            --shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #0f0f12;
+                --card-bg: rgba(30, 30, 35, 0.7);
+                --text-main: #f5f5f7;
+                --text-muted: #a1a1a6;
+                --nav-bg: rgba(15, 15, 18, 0.8);
+                --border-color: rgba(255,255,255,0.05);
+                --shadow: 0 10px 40px rgba(0,0,0,0.3);
+            }
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Poppins', sans-serif;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* Blob decorativo di sfondo */
+        body::before {
+            content: "";
+            position: fixed;
+            top: -10%; right: -10%;
+            width: 40%; height: 40%;
+            background: radial-gradient(circle, var(--accent-soft) 0%, transparent 70%);
+            z-index: -1;
+        }
+
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 25px; }
+
+        /* --- Navigation (Uguale alla Home) --- */
+        .main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 25px;
+            position: fixed;
+            top: 20px; left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 1100px;
+            z-index: 1000;
+            background: var(--nav-bg);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 50px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow);
+        }
+        .logo img { max-height: 40px; border-radius: 50%; }
+        .menu-btn { background: none; border: none; cursor: pointer; display: flex; flex-direction: column; gap: 4px; padding: 5px; }
+        .menu-btn span { width: 24px; height: 2px; background: var(--text-main); border-radius: 2px; }
+
+        /* --- Sidebar --- */
+        .sidebar {
+            position: fixed;
+            top: 0; right: -100%;
+            width: 300px; height: 100%;
+            background: var(--nav-bg);
+            backdrop-filter: blur(20px);
+            z-index: 2000;
+            padding: 40px;
+            transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            border-left: 1px solid var(--border-color);
+        }
+        .sidebar.open { right: 0; }
+        .sidebar ul { list-style: none; margin-top: 60px; }
+        .sidebar ul li a {
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 0;
+        }
+        .close-menu-btn { background: none; border: none; font-size: 30px; color: var(--text-main); cursor: pointer; float: right; }
+
+        /* --- Header Pagina --- */
+        .page-header {
+            padding: 160px 0 60px;
+            text-align: center;
+        }
+        .page-header h1 { font-size: 3rem; font-weight: 800; margin-bottom: 15px; }
+        .page-header p { color: var(--text-muted); font-size: 1.1rem; max-width: 600px; margin: 0 auto; }
+
+        /* --- Grid Progetti --- */
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            padding-bottom: 100px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            padding: 40px 30px;
+            text-align: center;
+            transition: 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow);
+            border-color: var(--accent);
+        }
+
+        .card img {
+            width: 70px;
+            height: 70px;
+            border-radius: 18px;
+            margin-bottom: 20px;
+            object-fit: cover;
+        }
+
+        .card h2 { font-size: 1.5rem; margin-bottom: 12px; font-weight: 700; }
+        .card p { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 25px; flex-grow: 1; }
+
+        .btn-explore {
+            padding: 10px 25px;
+            border-radius: 15px;
+            text-decoration: none;
+            font-weight: 600;
+            background: var(--accent-soft);
+            color: var(--accent);
+            transition: 0.3s;
+            width: 100%;
+        }
+
+        .card:hover .btn-explore {
+            background: var(--accent);
+            color: white;
+        }
+
+        /* Badge "In Sviluppo" */
+        .dev-badge {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            background: #eee;
+            color: #777;
+            padding: 4px 10px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .boost-badge {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    /* Usa il magenta di Aura ma molto trasparente */
+    background: rgba(240, 91, 255, 0.15); 
+    color: var(--accent); /* Il magenta pieno per il testo */
+    padding: 5px 12px;
+    border-radius: 50px; /* Completamente arrotondato (pill style) */
+    margin-bottom: 12px;
+    display: inline-block;
+    border: 1px solid rgba(240, 91, 255, 0.2);
+    backdrop-filter: blur(5px);
+}
+        @media (prefers-color-scheme: dark) { .dev-badge { background: #222; } }
+
+        @media (max-width: 768px) {
+            .page-header h1 { font-size: 2.2rem; }
+            .projects-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <div class="logo"><img src="images/aura.jpg" alt="Aura Logo"></div>
+        <button id="open-menu" class="menu-btn" aria-label="Apri menu">
+            <span></span><span></span><span></span>
+        </button>
+    </header>
+
+    <nav id="sidebar" class="sidebar">
+        <button id="close-menu" class="close-menu-btn">&times;</button>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="https://apps.aurastudioitalia.it">Account</a></li>
+            <li><a href="progetti.html" style="color: var(--accent);">Servizi</a></li>
+            <li><a href="https://support.aurastudioitalia.it">Contattaci</a></li>
+        </ul>
+    </nav>
+
+    <main class="container">
+        <header class="page-header">
+            <h1>I nostri <span style="color: var(--accent)">Servizi</span></h1>
+            <p>Esplora l'ecosistema digitale di Aura. Dalle community ai software di messaggistica, tutto in un unico posto.</p>
+        </header>
+
+        <div class="projects-grid">
+            <div class="card">
+                <img src="images/services/communitylogo.png" alt="Aura Community">
+                <h2>Aura Community</h2>
+                <p>Il punto di incontro per utenti e appassionati. Unisciti ai nostri gruppi WhatsApp e Telegram.</p>
+                <a href="https://verse.aurastudioitalia.it" class="btn-explore">Esplora</a>
+            </div>
+
+            <div class="card">
+              <span class="boost-badge">In evidenza</span>
+                <img src="images/services/aura.jpg" alt="Aura Launchboard">
+                <h2>Aura Launchboard</h2>
+                <p>Tutti i servizi Aura, in un unico posto.</p>
+                <a href="https://apps.aurastudioitalia.it" class="btn-explore">Esplora</a>
+            </div>
+
+            <div class="card">
+                <img src="images/services/nyra.png" alt="Nyra">
+                <h2>Nyra</h2>
+                <p>Assistente virtuale intelligente basato su GPT-5 per supporto e creatività senza limiti.</p>
+                <a href="httos://nyra.aurastudioitalia.it" class="btn-explore">Esplora</a>
+            </div>
+
+            <div class="card">
+                <img src="images/services/italianmodbot.png" alt="IMB">
+                <h2>ItalianModerationBOT</h2>
+                <p>La soluzione completa per la moderazione e la gestione di server Discord italiani.</p>
+                <a href="https://imb.aurastudioitalia.it" class="btn-explore">Esplora</a>
+            </div>
+
+            <div class="card">
+                <img src="images/services/aurastore.png" alt="Aura Store">
+                <h2>Aura Store</h2>
+                <p>Il market ufficiale dove trovare e scaricare tutti i nostri software gratuitamente.</p>
+                <a href="https://store.aurastudioitalia.it" class="btn-explore">Esplora</a>
+            </div>
+
+ <div class="card">
+                <img src="images/services/auradocs.png" alt="Aura Store">
+                <h2>Aura Docs</h2>
+                <p>Creazione e gestione documenti sincronizzata sul cloud.</p>
+                <a href="https://docs.aurastudioitalia.it" class="btn-explore">Esplora</a>
+            </div>
+
+            <div class="card">
+                <span class="dev-badge">Prossimamente</span>
+                <img src="images/services/aurachat.png" alt="Aura Chat">
+                <h2>Aura Chat</h2>
+                <p>Comunicazione sicura, veloce e privata. Stiamo lavorando per offrirti il meglio.</p>
+                <a href="#" class="btn-explore" style="opacity: 0.5; cursor: not-allowed;">In sviluppo</a>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const openBtn = document.getElementById('open-menu');
+        const closeBtn = document.getElementById('close-menu');
+
+        openBtn.onclick = () => sidebar.classList.add('open');
+        closeBtn.onclick = () => sidebar.classList.remove('open');
+        
+        // Chiudi sidebar cliccando fuori o sui link
+        document.querySelectorAll('.sidebar a').forEach(link => {
+            link.onclick = () => sidebar.classList.remove('open');
+        });
+    </script>
+</body>
+</html>
