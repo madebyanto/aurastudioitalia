@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura/Timeline</title>
+    <link rel="icon" type="image/png" href="images/aura.jpg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --card-bg: rgba(255, 255, 255, 0.7);
+            --text-main: #2d3436;
+            --text-muted: #636e72;
+            --accent: #F05BFF;
+            --accent-soft: rgba(240, 91, 255, 0.1);
+            --nav-bg: rgba(255, 255, 255, 0.8);
+            --border-color: rgba(0,0,0,0.05);
+            --shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #0f0f12;
+                --card-bg: rgba(30, 30, 35, 0.7);
+                --text-main: #f5f5f7;
+                --text-muted: #a1a1a6;
+                --nav-bg: rgba(15, 15, 18, 0.8);
+                --border-color: rgba(255,255,255,0.05);
+                --shadow: 0 10px 40px rgba(0,0,0,0.3);
+            }
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: var(--bg-color); color: var(--text-main); font-family: 'Poppins', sans-serif; line-height: 1.6; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 0 25px; }
+
+        /* Navigation */
+        .main-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 25px; position: fixed; top: 20px; left: 50%;
+            transform: translateX(-50%); width: 90%; max-width: 1100px;
+            z-index: 1000; background: var(--nav-bg); backdrop-filter: blur(15px);
+            border-radius: 50px; border: 1px solid var(--border-color); box-shadow: var(--shadow);
+        }
+        .logo img { max-height: 40px; border-radius: 50%; }
+        .menu-btn { background: none; border: none; cursor: pointer; display: flex; flex-direction: column; gap: 4px; }
+        .menu-btn span { width: 24px; height: 2px; background: var(--text-main); border-radius: 2px; }
+
+        /* Story Header */
+        .story-header { padding: 160px 0 60px; text-align: center; }
+        .story-header h1 { font-size: 3.5rem; font-weight: 800; line-height: 1.1; }
+        .story-header p { color: var(--text-muted); font-size: 1.2rem; margin-top: 15px; }
+
+        /* Timeline */
+        .timeline { position: relative; padding: 40px 0; }
+        .timeline::before {
+            content: ''; position: absolute; left: 50%; width: 2px; height: 100%;
+            background: linear-gradient(to bottom, transparent, var(--accent), transparent);
+            transform: translateX(-50%);
+        }
+
+        .timeline-item {
+            margin-bottom: 80px; position: relative; width: 100%;
+            display: flex; justify-content: flex-start;
+            opacity: 0; transform: translateY(40px); transition: 1s ease-out;
+        }
+        .timeline-item.visible { opacity: 1; transform: translateY(0); }
+        .timeline-item:nth-child(even) { justify-content: flex-end; }
+
+        .timeline-content {
+            width: 42%; background: var(--card-bg); padding: 35px;
+            border-radius: 35px; border: 1px solid var(--border-color);
+            box-shadow: var(--shadow); position: relative; backdrop-filter: blur(10px);
+        }
+
+        .timeline-dot {
+            position: absolute; left: 50%; top: 40px; width: 20px; height: 20px;
+            background: var(--accent); border-radius: 50%; transform: translateX(-50%);
+            box-shadow: 0 0 20px var(--accent); z-index: 2; border: 4px solid var(--bg-color);
+        }
+
+        .date { display: block; color: var(--accent); font-weight: 800; font-size: 0.9rem; margin-bottom: 10px; opacity: 0.8; }
+        .timeline-content h3 { font-size: 1.4rem; margin-bottom: 10px; font-weight: 700; }
+        .timeline-content p { color: var(--text-muted); font-size: 0.95rem; }
+
+        /* Team Section */
+        .team-section { padding: 100px 0; text-align: center; }
+        .team-section h2 { font-size: 2.5rem; margin-bottom: 50px; }
+        .team-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 25px; margin-top: 40px;
+        }
+        .member {
+            background: var(--card-bg); padding: 30px 20px; border-radius: 35px;
+            border: 1px solid var(--border-color); transition: 0.3s;
+        }
+        .member:hover { transform: translateY(-10px); border-color: var(--accent); }
+        .member img { width: 90px; height: 90px; border-radius: 50%; margin-bottom: 15px; padding: 5px; border: 2px solid var(--accent-soft); }
+        .member h4 { font-size: 1.2rem; font-weight: 700; }
+        .member span { display: block; font-size: 0.8rem; color: var(--accent); font-weight: 600; text-transform: uppercase; margin-top: 5px; }
+
+        @media (max-width: 768px) {
+            .timeline::before { left: 20px; }
+            .timeline-item { justify-content: flex-start !important; padding-left: 50px; }
+            .timeline-content { width: 100%; }
+            .timeline-dot { left: 20px; }
+            .story-header h1 { font-size: 2.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <div class="logo"><img src="images/aura.jpg" alt="Aura Logo"></div>
+    </header>
+
+    <main class="container">
+        <section class="story-header">
+            <span class="date" style="font-size: 1.1rem">2022 — OGGI</span>
+            <h1>Il nostro <span style="color:var(--accent)">Percorso</span></h1>
+            <p>Dalle prime righe di codice per passione alla costruzione di un ecosistema digitale.</p>
+        </section>
+
+        <section class="timeline">
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <span class="date">AGOSTO 2022</span>
+                    <h3>Le Radici: IMB</h3>
+                    <p>Nasce ItalianModerationsBOT, un progetto creato per pura passione da due amici. È la scintilla che dà il via a tutto il percorso.</p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <span class="date">LUGLIO 2023</span>
+                    <h3>L'era Lumi Labs</h3>
+                    <p>IMB Team evolve in Lumi Labs. Lanciamo Lumiful, un social network ambizioso che ha rappresentato la nostra prima vera sfida su larga scala.</p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <span class="date">MARZO 2024</span>
+                    <h3>La transizione PixeLabs</h3>
+                    <p>Lumi Labs si trasforma in PixeLabs. Qui compaiono le prime idee concrete di community e sviluppo software strutturato.</p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <span class="date">SETTEMBRE 2024</span>
+                    <h3>L'identità Aura</h3>
+                    <p>Per motivi interni PixeLabs viene sciolta e nasce ufficialmente Aura. Debuttano Aura Community e Aura Computer Management.</p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <span class="date">MAGGIO 2025</span>
+                    <h3>La Prima Rivoluzione</h3>
+                    <p>Aura diventa professionale: introduciamo l'AI Nyra, un nuovo sito web e grafiche di alto livello. La qualità diventa il nostro standard.</p>
+                </div>
+            </div>
+
+            <div class="timeline-item">
+                <div class="timeline-dot"></div>
+                <div class="timeline-content">
+                    <span class="date">OGGI 2026</span>
+                    <h3>La Seconda Rivoluzione</h3>
+                    <p>Espandiamo l'ecosistema con Launchboard e Docs in collaborazione con UPLOOP STUDIO. Eliminiamo il superfluo per puntare all'eccellenza.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="team-section">
+            <h2>Lo <span style="color:var(--accent)">Staff</span></h2>
+            <div class="team-grid">
+                <div class="member">
+                    <img src="https://zenos.ovh/03d70bc285e01f9c9f1fb1bf9afd9a06~tplv-tiktokx-cropcenter_1080_1080.jpeg" alt="Anto">
+                    <h4>Anto</h4>
+                    <span>Owner & Developer</span>
+                </div>
+                <div class="member">
+                    <img src="https://cdn.discordapp.com/attachments/1324526151850393702/1468386661598629968/lkm2rsS.png?ex=6993a725&is=699255a5&hm=cc986acfa9329cb6db7d1ff777d71b14b4d601c7bbb9156842e1bc2bddc81303&" alt="Giuse">
+                    <h4>Giuse</h4>
+                    <span>Co-Owner & Staff Coord.</span>
+                </div>
+                <div class="member">
+                    <img src="https://media.mattedev.com/img/mlogo.jpg" alt="Matteo">
+                    <h4>Matteo</h4>
+                    <span>Head Developer</span>
+                </div>
+                <div class="member">
+                    <img src="https://zenos.ovh/HD-wallpaper-just-monika-ddlc-monika-physcological-horror.jpg" alt="Adam">
+                    <h4>Adam</h4>
+                    <span>Designer</span>
+                </div>
+                <div class="member">
+                    <img src="https://cdn.discordapp.com/attachments/1020938995263361126/1472784377304842262/VWqBMpO.png?ex=6993d4d6&is=69928356&hm=22d3e5c9f8886104187d65f7e1dc37903dbe4ba131d543479ccacf385f26ae79&" alt="Anto L.">
+                    <h4>Anto L.</h4>
+                    <span>Support Manager</span>
+                </div>
+                <div class="member">
+                    <img src="images/aura.jpg" alt="Met">
+                    <h4>Met</h4>
+                    <span>Community Mod</span>
+                </div>
+                <div class="member">
+                    <img src="https://cdn.discordapp.com/avatars/1133036561693409350/572211c38661616c05174441f2436760.webp?size=1024" alt="Corrado">
+                    <h4>Corrado</h4>
+                    <span>Social Media Manager</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Reveal Animation on Scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('visible');
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.timeline-item').forEach(item => observer.observe(item));
+    </script>
+</body>
+</html>
