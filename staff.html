@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura/Staff</title>
+    <link rel="icon" type="image/png" href="images/aura.jpg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --card-bg: rgba(255, 255, 255, 0.7);
+            --text-main: #2d3436;
+            --text-muted: #636e72;
+            --accent: #F05BFF;
+            --accent-soft: rgba(240, 91, 255, 0.1);
+            --nav-bg: rgba(255, 255, 255, 0.8);
+            --border-color: rgba(0,0,0,0.05);
+            --shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #0f0f12;
+                --card-bg: rgba(30, 30, 35, 0.7);
+                --text-main: #f5f5f7;
+                --text-muted: #a1a1a6;
+                --nav-bg: rgba(15, 15, 18, 0.8);
+                --border-color: rgba(255,255,255,0.05);
+                --shadow: 0 10px 40px rgba(0,0,0,0.3);
+            }
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            background-color: var(--bg-color); 
+            color: var(--text-main); 
+            font-family: 'Poppins', sans-serif; 
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 25px; }
+
+        /* Navigation Minimal */
+        .main-header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 25px; position: fixed; top: 20px; left: 50%;
+            transform: translateX(-50%); width: 90%; max-width: 1100px;
+            z-index: 1000; background: var(--nav-bg); backdrop-filter: blur(15px);
+            border-radius: 50px; border: 1px solid var(--border-color); box-shadow: var(--shadow);
+        }
+        .logo img { max-height: 40px; border-radius: 50%; }
+        .back-btn { 
+            text-decoration: none; color: var(--text-main); font-weight: 600; 
+            font-size: 0.9rem; display: flex; align-items: center; gap: 8px;
+        }
+
+        /* Header Sezione */
+        .page-header { padding: 160px 0 60px; text-align: center; }
+        .page-header h1 { font-size: 3.5rem; font-weight: 800; line-height: 1.1; }
+        .page-header p { color: var(--text-muted); font-size: 1.1rem; margin-top: 15px; max-width: 600px; margin-inline: auto; }
+
+        /* Team Grid */
+        .team-section { padding-bottom: 100px; }
+        .team-grid {
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 30px;
+        }
+        .member {
+            background: var(--card-bg); padding: 40px 20px; border-radius: 40px;
+            border: 1px solid var(--border-color); transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-align: center; backdrop-filter: blur(10px);
+        }
+        .member:hover { 
+            transform: translateY(-12px); 
+            border-color: var(--accent); 
+            box-shadow: var(--shadow);
+        }
+        .member img { 
+            width: 110px; height: 110px; border-radius: 50%; 
+            margin-bottom: 20px; padding: 5px; 
+            border: 2px solid var(--accent-soft);
+            object-fit: cover;
+        }
+        .member h4 { font-size: 1.3rem; font-weight: 700; margin-bottom: 5px; }
+        .member span { 
+            display: inline-block; font-size: 0.75rem; 
+            color: var(--accent); font-weight: 700; 
+            text-transform: uppercase; letter-spacing: 1px;
+            background: var(--accent-soft);
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        /* Join Section */
+        .join-us {
+            background: var(--accent-soft);
+            padding: 60px;
+            border-radius: 40px;
+            text-align: center;
+            margin-bottom: 80px;
+            border: 1px dashed var(--accent);
+        }
+        .join-us h2 { margin-bottom: 15px; }
+        .btn-apply {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 30px;
+            background: var(--accent);
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+        .btn-apply:hover { opacity: 0.9; transform: scale(1.05); }
+
+        @media (max-width: 768px) {
+            .page-header h1 { font-size: 2.5rem; }
+            .team-grid { grid-template-columns: 1fr 1fr; gap: 15px; }
+            .member { padding: 30px 15px; }
+            .member img { width: 80px; height: 80px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="main-header">
+        <div class="logo"><img src="images/aura.jpg" alt="Aura Logo"></div>
+        <a href="index.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Torna alla Home</a>
+    </header>
+
+    <main class="container">
+        <section class="page-header">
+            <h1>Le menti dietro <span style="color:var(--accent)">Aura</span></h1>
+            <p>Un gruppo affiatato di sviluppatori, creativi e sognatori che lavorano ogni giorno per innovare il panorama digitale italiano.</p>
+        </section>
+
+        <section class="team-section">
+            <div class="team-grid">
+                <div class="member">
+                    <img src="https://anto.aurastudioitalia.it/anto.jpg" alt="Anto">
+                    <h4>Anto</h4>
+                    <span>Owner & Developer</span>
+                </div>
+                <div class="member">
+                    <img src="https://cdn.discordapp.com/attachments/1324526151850393702/1468386661598629968/lkm2rsS.png?ex=6993a725&is=699255a5&hm=cc986acfa9329cb6db7d1ff777d71b14b4d601c7bbb9156842e1bc2bddc81303&" alt="Giuse">
+                    <h4>Giuse</h4>
+                    <span>Co-Owner & Staff Coord.</span>
+                </div>
+                <div class="member">
+                    <img src="https://media.mattedev.com/img/mlogo.jpg" alt="Matteo">
+                    <h4>Matteo</h4>
+                    <span>Head Developer</span>
+                </div>
+                <div class="member">
+                    <img src="https://zenos.ovh/HD-wallpaper-just-monika-ddlc-monika-physcological-horror.jpg" alt="Adam">
+                    <h4>Adam</h4>
+                    <span>Designer</span>
+                </div>
+                <div class="member">
+                    <img src="https://cdn.discordapp.com/attachments/1020938995263361126/1472784377304842262/VWqBMpO.png?ex=6993d4d6&is=69928356&hm=22d3e5c9f8886104187d65f7e1dc37903dbe4ba131d543479ccacf385f26ae79&" alt="Anto L.">
+                    <h4>Anto L.</h4>
+                    <span>Support Manager</span>
+                </div>
+                <div class="member">
+                    <img src="images/aura.jpg" alt="Met">
+                    <h4>Met</h4>
+                    <span>Community Mod</span>
+                </div>
+                <div class="member">
+                    <img src="https://cdn.discordapp.com/avatars/1133036561693409350/572211c38661616c05174441f2436760.webp?size=1024" alt="Corrado">
+                    <h4>Corrado</h4>
+                    <span>Social Media Manager</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="join-us">
+            <h2>Vuoi far parte del team? 🚀</h2>
+            <p>Siamo sempre alla ricerca di talenti appassionati. Se credi di poter dare un contributo ad Aura, non esitare.</p>
+            <a href="staffapp.html" class="btn-apply">Invia la tua candidatura</a>
+        </section>
+    </main>
+
+</body>
+</html>
