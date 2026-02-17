@@ -22,6 +22,7 @@
             --nav-bg: rgba(255, 255, 255, 0.8);
             --border-color: rgba(0,0,0,0.05);
             --shadow: 0 10px 30px rgba(0,0,0,0.05);
+            --grid-color: rgba(240, 91, 255, 0.07);
         }
 
         @media (prefers-color-scheme: dark) {
@@ -33,6 +34,7 @@
                 --nav-bg: rgba(15, 15, 18, 0.8);
                 --border-color: rgba(255,255,255,0.05);
                 --shadow: 0 10px 40px rgba(0,0,0,0.3);
+                --grid-color: rgba(240, 91, 255, 0.1);
             }
         }
 
@@ -47,6 +49,23 @@
             overflow-x: hidden;
         }
 
+        /* Glassmorphism Grid Background */
+        .glass-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 800px; /* Copre la parte superiore */
+            background-image: 
+                linear-gradient(var(--grid-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+            background-size: 40px 40px;
+            mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+            -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
         /* Soft Decorative Background Blobs */
         body::before {
             content: "";
@@ -54,13 +73,14 @@
             top: -10%; left: -10%;
             width: 40%; height: 40%;
             background: radial-gradient(circle, var(--accent-soft) 0%, transparent 70%);
-            z-index: -1;
+            z-index: -2;
         }
 
         .container {
             max-width: 1100px;
             margin: 0 auto;
             padding: 0 25px;
+            position: relative;
         }
 
         /* --- Header --- */
@@ -87,23 +107,23 @@
         .logo img { max-height: 40px; border-radius: 50%; }
 
         .menu-btn {
-    background: none; /* Rimuove il quadrato magenta */
-    border: none;
-    cursor: pointer;
-    padding: 5px; /* Ridotto per non occupare spazio inutile */
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    outline: none; /* Rimuove il bordo blu al click su alcuni browser */
-}
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            outline: none;
+        }
     
-.menu-btn span { 
-    width: 24px; 
-    height: 2px; 
-    background: var(--text-main); /* Ora sono dello stesso colore del testo */
-    border-radius: 2px; 
-    transition: 0.3s; /* Rende eventuali animazioni più fluide */
-}
+        .menu-btn span { 
+            width: 24px; 
+            height: 2px; 
+            background: var(--text-main);
+            border-radius: 2px; 
+            transition: 0.3s;
+        }
 
         /* --- Sidebar --- */
         .sidebar {
@@ -216,49 +236,6 @@
         .whatsapp { background: #25D366; }
         .telegram { background: #0088cc; }
 
-        footer {
-            padding: 80px 0 40px;
-            text-align: center;
-            background: var(--accent-soft);
-            margin-top: 50px;
-            border-top: 1px solid var(--border-color);
-        }
-        .social-icons { display: flex; justify-content: center; gap: 15px; margin-bottom: 30px; }
-        .social-icon {
-            width: 45px; 
-            height: 45px;
-            background: var(--card-bg); /* Sfondo scuro/trasparente di default */
-            border-radius: 12px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: var(--text-muted); /* Colore icona di default */
-            text-decoration: none;
-            transition: all 0.3s ease;
-            border: 1px solid var(--border-color);
-        }
-        .social-icon:hover {
-            background: var(--accent); /* Lo sfondo diventa magenta */
-            transform: translateY(-3px) rotate(5deg); /* Leggera rotazione e alzata */
-            border-color: var(--accent);
-        }
-
-        .social-icon:hover i {
-            color: #4b0082; /* Viola molto scuro (Indigo) per contrasto sul magenta */
-        }
-
-        .footer-credit { font-size: 0.85rem; color: var(--text-muted); }
-
-        /* --- Mobile Responsive --- */
-        @media (max-width: 768px) {
-            .two-columns { grid-template-columns: 1fr; text-align: center; padding: 30px; }
-            .info-text { text-align: center; }
-            .info-text h2 { text-align: center; }
-            .hero { padding-top: 140px; }
-            .main-header { top: 10px; width: 95%; }
-            .stay-in-buttons { flex-direction: column; }
-        }
-
         /* --- Footer Modern Design --- */
         footer {
             padding: 80px 0 40px;
@@ -316,22 +293,29 @@
             padding-left: 5px;
         }
 
-        /* Social Icons in Footer */
         .footer-socials {
             display: flex;
             gap: 15px;
         }
 
         .social-icon {
-            font-size: 1.2rem;
+            width: 45px; 
+            height: 45px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             color: var(--text-muted);
-            transition: 0.3s;
             text-decoration: none;
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
         }
-
         .social-icon:hover {
-            color: var(--accent);
-            transform: translateY(-3px);
+            background: var(--accent);
+            transform: translateY(-3px) rotate(5deg);
+            border-color: var(--accent);
+            color: #4b0082;
         }
 
         .footer-bottom {
@@ -349,23 +333,23 @@
             color: var(--text-muted);
         }
 
-        /* Responsive Footer */
+        /* --- Mobile Responsive --- */
         @media (max-width: 768px) {
-            .footer-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-            .footer-brand {
-                grid-column: span 2;
-                margin-bottom: 20px;
-            }
-            .footer-bottom {
-                flex-direction: column;
-                text-align: center;
-            }
+            .two-columns { grid-template-columns: 1fr; text-align: center; padding: 30px; }
+            .info-text { text-align: center; }
+            .info-text h2 { text-align: center; }
+            .hero { padding-top: 140px; }
+            .main-header { top: 10px; width: 95%; }
+            .stay-in-buttons { flex-direction: column; }
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+            .footer-brand { grid-column: span 2; margin-bottom: 20px; }
+            .footer-bottom { flex-direction: column; text-align: center; }
         }
     </style>
 </head>
 <body>
+
+    <div class="glass-grid"></div>
 
     <header class="main-header">
         <div class="logo">
