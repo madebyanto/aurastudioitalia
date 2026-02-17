@@ -194,6 +194,7 @@
             border-radius: 40px;
             border: 1px solid var(--border-color);
         }
+        
         .info-image img { width: 100%; max-width: 400px; border-radius: 10px; box-shadow: var(--shadow); }
         .info-text { text-align: left; }
         .info-text h2 { text-align: left; margin-bottom: 20px; }
@@ -224,18 +225,27 @@
         }
         .social-icons { display: flex; justify-content: center; gap: 15px; margin-bottom: 30px; }
         .social-icon {
-            width: 45px; height: 45px;
-            background: var(--card-bg);
+            width: 45px; 
+            height: 45px;
+            background: var(--card-bg); /* Sfondo scuro/trasparente di default */
             border-radius: 12px;
             display: flex;
             justify-content: center;
             align-items: center;
-            color: var(--text-main);
+            color: var(--text-muted); /* Colore icona di default */
             text-decoration: none;
-            transition: 0.3s;
+            transition: all 0.3s ease;
             border: 1px solid var(--border-color);
         }
-        .social-icon:hover { background: var(--accent); color: white; transform: rotate(10deg); }
+        .social-icon:hover {
+            background: var(--accent); /* Lo sfondo diventa magenta */
+            transform: translateY(-3px) rotate(5deg); /* Leggera rotazione e alzata */
+            border-color: var(--accent);
+        }
+
+        .social-icon:hover i {
+            color: #4b0082; /* Viola molto scuro (Indigo) per contrasto sul magenta */
+        }
 
         .footer-credit { font-size: 0.85rem; color: var(--text-muted); }
 
@@ -247,6 +257,111 @@
             .hero { padding-top: 140px; }
             .main-header { top: 10px; width: 95%; }
             .stay-in-buttons { flex-direction: column; }
+        }
+
+        /* --- Footer Modern Design --- */
+        footer {
+            padding: 80px 0 40px;
+            background: var(--bg-color);
+            border-top: 1px solid var(--border-color);
+            margin-top: 50px;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1fr 1fr;
+            gap: 40px;
+            text-align: left;
+            margin-bottom: 50px;
+        }
+
+        .footer-brand .footer-logo {
+            max-height: 50px;
+            border-radius: 50%;
+            margin-bottom: 20px;
+        }
+
+        .footer-brand p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            max-width: 300px;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .footer-col h4 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--text-main);
+        }
+
+        .footer-col ul {
+            list-style: none;
+        }
+
+        .footer-col ul li {
+            margin-bottom: 12px;
+        }
+
+        .footer-col ul li a {
+            text-decoration: none;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            transition: 0.3s;
+        }
+
+        .footer-col ul li a:hover {
+            color: var(--accent);
+            padding-left: 5px;
+        }
+
+        /* Social Icons in Footer */
+        .footer-socials {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-icon {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            transition: 0.3s;
+            text-decoration: none;
+        }
+
+        .social-icon:hover {
+            color: var(--accent);
+            transform: translateY(-3px);
+        }
+
+        .footer-bottom {
+            padding-top: 30px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .footer-credit {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        /* Responsive Footer */
+        @media (max-width: 768px) {
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .footer-brand {
+                grid-column: span 2;
+                margin-bottom: 20px;
+            }
+            .footer-bottom {
+                flex-direction: column;
+                text-align: center;
+            }
         }
     </style>
 </head>
@@ -342,17 +457,55 @@
 
     <footer>
         <div class="container">
-            <h3>Seguici sui social</h3>
-            <div class="social-icons">
-                <a href="https://discord.gg/tctmBsMnfk" class="social-icon"><i class="fa-brands fa-discord"></i></a>
-                <a href="https://tiktok.com/@aurastudio.italia" class="social-icon"><i class="fa-brands fa-tiktok"></i></a>
-                <a href="https://instagram.com/aurastudio.italia" class="social-icon"><i class="fa-brands fa-instagram"></i></a>
-                <a href="https://youtube.com/@aurastudio.italia" class="social-icon"><i class="fa-brands fa-youtube"></i></a>
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <img src="images/aura.jpg" alt="Aura Logo" class="footer-logo">
+                    <p>Senti l'energia di Aura. Creiamo soluzioni digitali per connettere persone e semplificare la quotidianità.</p>
+                    <div class="footer-socials">
+                        <a href="https://discord.gg/tctmBsMnfk" class="social-icon"><i class="fa-brands fa-discord"></i></a>
+                        <a href="https://tiktok.com/@aurastudio.italia" class="social-icon"><i class="fa-brands fa-tiktok"></i></a>
+                        <a href="https://instagram.com/aurastudio.italia" class="social-icon"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="https://youtube.com/@aurastudio.italia" class="social-icon"><i class="fa-brands fa-youtube"></i></a>
+                    </div>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Servizi</h4>
+                    <ul>
+                        <li><a href="https://apps.aurastudioitalia.it">Launchboard</a></li>
+                        <li><a href="https://nyra.aurastudioitalia.it">Nyra AI</a></li>
+                        <li><a href="progetti.html">Tutti i Progetti</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Risorse</h4>
+                    <ul>
+                        <li><a href="timeline.html">La nostra Storia</a></li>
+                        <li><a href="staffapp.html">Lavora con noi</a></li>
+                        <li><a href="https://support.aurastudioitalia.it">Supporto</a></li>
+                        <li><a href="staff.html">Lo staff dietro Aura</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Legale</h4>
+                    <ul>
+                        <li><a href="https://privacy.aurastudioitalia.it">Centro Privacy</a></li>
+                        <li><a href="https://privacy.aurastudioitalia.it/tos.html">Termini di Servizio</a></li>
+                        <li><a href="https://privacy.aurastudioitalia.it/privacypolicy.html">Privacy Policy</a></li>
+                    </ul>
+                </div>
             </div>
-            <p class="footer-credit" id="footer-credit">
-                Aura Studio Italia &bull; Multi-Sede (Eboli, Conversano)<br>
-                v1.3 &bull; <span id="gpu-info"></span>
-            </p>
+
+            <div class="footer-bottom">
+                <p class="footer-credit">
+                    © 2026 Aura Studio Italia &bull; Multi-Sede (Eboli, Conversano)
+                </p>
+                <p class="footer-credit" style="opacity: 0.6;">
+                    v1.3 &bull; <span id="gpu-info"></span>
+                </p>
+            </div>
         </div>
     </footer>
 
