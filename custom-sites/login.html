@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accedi ad Aura</title>
+    <link rel="icon" href="/images/aura.jpg" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDsrHAtIh5bsYDHa1wz0LMcmciChAoRikU",
+            authDomain: "myauraid-f03c6.firebaseapp.com",
+            projectId: "myauraid-f03c6",
+            storageBucket: "myauraid-f03c6.appspot.com",
+            messagingSenderId: "190478237725",
+            appId: "1:190478237725:web:0d39907473f511b85a06f4"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        
+        // Persistenza Account: Forza il salvataggio locale
+        auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+
+        // Controllo Persistenza: Se l'utente è già loggato e verificato, vai in dashboard
+        auth.onAuthStateChanged((user) => {
+            if (user && user.emailVerified) {
+                window.location.href = "buy.html";
+            }
+        });
+
+        function normalizeAuthError(err) {
+            if (!err) return 'UNKNOWN';
+            if (err.code === 'auth/internal-error') {
+                if (err.message?.includes('INVALID_LOGIN_CREDENTIALS')) return 'INVALID_LOGIN_CREDENTIALS';
+                return 'INTERNAL_ERROR';
+            }
+            return err.code || 'UNKNOWN';
+        }
+
+        function getAuthErrorMessage(code) {
+            const messages = {
+                'auth/invalid-email': 'L’email non è valida.',
+                'auth/user-not-found': 'Email o password non corretti.',
+                'auth/wrong-password': 'Email o password non corretti.',
+                'INVALID_LOGIN_CREDENTIALS': 'Email o password non corretti.',
+                'auth/user-disabled': 'Questo account è stato disabilitato.',
+                'auth/too-many-requests': 'Troppi tentativi. Riprova più tardi.',
+                'auth/network-request-failed': 'Problema di connessione.',
+                'INTERNAL_ERROR': 'Errore temporaneo. Riprova.',
+                'UNKNOWN': 'Si è verificato un errore.'
+            };
+            return messages[code] || messages.UNKNOWN;
+        }
+    </script>
+
+    <style>
+        :root {
+            --primary: #e008f6;
+            --primary-dark: #c100e0;
+            --aura-glow: rgba(224, 8, 246, 0.15);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            
+            /* Default Dark (Originale) */
+            --bg-color: #050505;
+            --card-bg: rgba(20, 20, 20, 0.8);
+            --text-main: #ffffff;
+            --text-sub: rgba(255, 255, 255, 0.6);
+            --input-bg: rgba(255, 255, 255, 0.07);
+            --input-border: rgba(255, 255, 255, 0.1);
+            --tab-bg: rgba(255, 255, 255, 0.05);
+            --splash-bg: #000000;
+        }
+
+        /* Tema Light Adattivo */
+        @media (prefers-color-scheme: light) {
+            :root {
+                --bg-color: #f5f5f7;
+                --card-bg: rgba(255, 255, 255, 0.9);
+                --text-main: #1d1d1f;
+                --text-sub: rgba(0, 0, 0, 0.6);
+                --input-bg: rgba(0, 0, 0, 0.05);
+                --input-border: rgba(0, 0, 0, 0.1);
+                --tab-bg: rgba(0, 0, 0, 0.05);
+                --splash-bg: #ffffff;
+            }
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Poppins', sans-serif; }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            position: relative;
+            transition: background-color 0.5s ease;
+        }
+
+        .bg-glow {
+            position: absolute;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, var(--aura-glow) 0%, transparent 70%);
+            filter: blur(80px);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        #splash {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--splash-bg); display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 9999;
+            transition: opacity 0.8s ease, visibility 0.8s;
+        }
+
+        .spinner {
+            width: 40px; height: 40px;
+            border: 3px solid var(--input-border);
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .auth-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            padding: 40px;
+            border-radius: 24px;
+            border: 1px solid var(--input-border);
+            width: 100%;
+            max-width: 420px;
+            z-index: 10;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .logo { width: 120px; margin-bottom: 25px; transition: var(--transition); }
+        .logo:hover { transform: scale(1.05); filter: drop-shadow(0 0 10px var(--primary)); }
+
+        h1 { font-size: 1.5rem; font-weight: 600; margin-bottom: 10px; letter-spacing: -0.5px; }
+        p.subtitle { font-size: 0.9rem; color: var(--text-sub); margin-bottom: 30px; }
+
+        .tab-group {
+            display: flex;
+            background: var(--tab-bg);
+            padding: 5px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+
+        .tab-btn {
+            flex: 1; padding: 10px; border: none; background: none;
+            color: var(--text-main); font-size: 0.9rem; font-weight: 500;
+            cursor: pointer; border-radius: 8px; transition: var(--transition);
+        }
+
+        .tab-btn.active { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(224, 8, 246, 0.3); }
+
+        form { display: flex; flex-direction: column; gap: 15px; }
+        
+        input {
+            width: 100%; padding: 14px 16px;
+            background: var(--input-bg);
+            border: 1px solid var(--input-border);
+            border-radius: 12px; color: var(--text-main); font-size: 0.95rem;
+            transition: var(--transition);
+        }
+
+        input:focus {
+            outline: none; border-color: var(--primary);
+            background: var(--input-bg);
+            box-shadow: 0 0 0 4px rgba(224, 8, 246, 0.1);
+        }
+
+        button.main-btn {
+            background: var(--primary); color: white; border: none;
+            padding: 14px; border-radius: 12px; font-weight: 600;
+            font-size: 1rem; cursor: pointer; transition: var(--transition);
+            margin-top: 10px;
+        }
+
+        button.main-btn:hover { background: var(--primary-dark); transform: translateY(-2px); }
+
+        .footer-links { margin-top: 20px; font-size: 0.85rem; }
+        .footer-links a { color: var(--primary); text-decoration: none; font-weight: 500; }
+
+        .message {
+            font-size: 0.85rem; padding: 10px; border-radius: 8px;
+            margin-bottom: 20px; display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        .message.info { display: block; background: rgba(224, 8, 246, 0.1); color: var(--primary); }
+        .message.error { display: block; background: rgba(255, 75, 43, 0.1); color: #ff4b2b; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 480px) {
+            .auth-card { padding: 30px 20px; border-radius: 0; height: 100%; max-width: 100%; border: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="bg-glow"></div>
+
+<div id="splash">
+    <div class="spinner"></div>
+    <p style="letter-spacing: 2px; font-size: 0.8rem; opacity: 0.6; color: var(--text-main);">Connessione al server...</p>
+</div>
+
+<div class="auth-card">
+    <img src="https://apps.aurastudioitalia.it/images/aura-nobg.png" alt="Aura Logo" class="logo">
+    
+    <div class="tab-group">
+        <button id="tab-login" class="tab-btn active">Accedi</button>
+        <button id="tab-signup" class="tab-btn">Registrati</button>
+    </div>
+
+    <div id="login-box">
+        <h1>Bentornato</h1>
+        <p class="subtitle">Inserisci le tue credenziali per continuare</p>
+        <div id="msg-login" class="message"></div>
+        
+        <form id="login-form">
+            <input type="email" id="l-email" placeholder="Email" required>
+            <input type="password" id="l-pass" placeholder="Password" required>
+            <button type="submit" class="main-btn">Accedi</button>
+        </form>
+        
+        <div class="footer-links">
+            <a href="#" id="forgot-password">Password dimenticata?</a>
+        </div>
+    </div>
+
+    <div id="signup-box" style="display: none;">
+        <h1>Crea Account</h1>
+        <p class="subtitle">Entra a far parte dell'universo Aura</p>
+        <div id="msg-signup" class="message"></div>
+        
+        <form id="signup-form">
+            <div style="display: flex; gap: 10px;">
+                <input type="text" id="s-nome" placeholder="Nome" required>
+                <input type="text" id="s-cognome" placeholder="Cognome" required>
+            </div>
+            <input type="email" id="s-email" placeholder="Email" required>
+            <input type="password" id="s-pass" placeholder="Password" required>
+            <button type="submit" class="main-btn">Crea Account</button>
+        </form>
+        
+        <p class="footer-links" style="opacity: 0.6; font-size: 0.75rem; margin-top: 25px;">
+            Registrandoti, accetti i <a href="#">Termini</a> e la <a href="#">Privacy</a>.
+        </p>
+    </div>
+</div>
+
+<script>
+    const tabLogin = document.getElementById('tab-login');
+    const tabSignup = document.getElementById('tab-signup');
+    const loginBox = document.getElementById('login-box');
+    const signupBox = document.getElementById('signup-box');
+
+    // Switch Tab
+    tabLogin.onclick = () => {
+        tabLogin.classList.add('active'); tabSignup.classList.remove('active');
+        loginBox.style.display = 'block'; signupBox.style.display = 'none';
+    };
+    tabSignup.onclick = () => {
+        tabSignup.classList.add('active'); tabLogin.classList.remove('active');
+        loginBox.style.display = 'none'; signupBox.style.display = 'block';
+    };
+
+    function showMsg(boxId, text, isError = false) {
+        const el = document.getElementById(boxId);
+        el.textContent = text;
+        el.className = isError ? 'message error' : 'message info';
+    }
+
+    // Logic Login
+    document.getElementById('login-form').onsubmit = (e) => {
+        e.preventDefault();
+        const email = document.getElementById('l-email').value;
+        const pass = document.getElementById('l-pass').value;
+
+        showMsg('msg-login', 'Verifica in corso...');
+        auth.signInWithEmailAndPassword(email, pass)
+            .then(async (userCredential) => {
+                if (!userCredential.user.emailVerified) {
+                    showMsg('msg-login', 'Verifica la tua email prima di entrare.', true);
+                    await auth.signOut();
+                } else {
+                    window.location.href = "buy.html";
+                }
+            })
+            .catch(err => showMsg('msg-login', getAuthErrorMessage(normalizeAuthError(err)), true));
+    };
+
+    // Logic Signup
+    document.getElementById('signup-form').onsubmit = (e) => {
+        e.preventDefault();
+        const email = document.getElementById('s-email').value;
+        const pass = document.getElementById('s-pass').value;
+
+        showMsg('msg-signup', 'Creazione account...');
+        auth.createUserWithEmailAndPassword(email, pass)
+            .then(async (res) => {
+                await res.user.sendEmailVerification();
+                showMsg('msg-signup', 'Email di verifica inviata! Controlla la posta.');
+                setTimeout(() => tabLogin.click(), 3000);
+            })
+            .catch(err => showMsg('msg-signup', getAuthErrorMessage(normalizeAuthError(err)), true));
+    };
+
+    // Password Reset
+    document.getElementById('forgot-password').onclick = (e) => {
+        e.preventDefault();
+        const email = document.getElementById('l-email').value;
+        if(!email) return showMsg('msg-login', 'Inserisci la tua email sopra.', true);
+        auth.sendPasswordResetEmail(email)
+            .then(() => showMsg('msg-login', 'Link di recupero inviato!'))
+            .catch(err => showMsg('msg-login', 'Errore nell\'invio del link.', true));
+    };
+
+    // Splash Control
+    window.onload = () => {
+        setTimeout(() => {
+            const splash = document.getElementById('splash');
+            splash.style.opacity = '0';
+            setTimeout(() => splash.style.visibility = 'hidden', 800);
+        }, 1500); 
+    };
+</script>
+
+</body>
+</html>

@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configura Ordine | Aura</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --aura-primary: #e008f6;
+            --aura-glow: rgba(224, 8, 246, 0.4);
+            --bg-main: #050505;
+            --text-main: #ffffff;
+            --card-bg: rgba(25, 25, 25, 0.9);
+            --border-glass: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        .glow {
+            position: fixed;
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, var(--aura-primary) 0%, transparent 70%);
+            filter: blur(120px);
+            opacity: 0.3;
+            z-index: -1;
+        }
+
+        .order-container {
+            background: var(--card-bg);
+            backdrop-filter: blur(25px);
+            width: 90%;
+            max-width: 460px;
+            padding: 40px;
+            border-radius: 30px;
+            border: 1px solid var(--border-glass);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+
+        .step { display: none; animation: fadeIn 0.5s ease forwards; }
+        .step.active { display: block; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        h2 { font-weight: 800; margin-bottom: 10px; font-size: 1.8rem; letter-spacing: -0.5px; }
+        p { color: #a1a1a6; font-size: 0.9rem; margin-bottom: 25px; }
+
+        select {
+            width: 100%;
+            padding: 16px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border-glass);
+            border-radius: 15px;
+            color: white;
+            font-size: 1rem;
+            margin-bottom: 20px;
+            outline: none;
+            appearance: none;
+        }
+
+        .data-box {
+            background: rgba(0,0,0,0.4);
+            padding: 20px;
+            border-radius: 20px;
+            text-align: left;
+            margin-bottom: 25px;
+            border: 1px solid rgba(224, 8, 246, 0.15);
+        }
+
+        .data-item { 
+            font-size: 0.85rem; 
+            margin-bottom: 8px; 
+            color: #d1d1d6;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding-bottom: 5px;
+        }
+        .data-item:last-child { border-bottom: none; }
+        .data-item span { color: var(--aura-primary); font-weight: 500; }
+        .data-item code { color: #8a8a8e; font-size: 0.75rem; }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border-radius: 50px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            margin-top: 10px;
+        }
+        .btn-next { background: var(--aura-primary); color: white; box-shadow: 0 10px 20px var(--aura-glow); }
+        .btn-next:hover { transform: translateY(-3px); filter: brightness(1.1); }
+        .btn-cancel { background: transparent; color: #ff4b2b; border: 1px solid rgba(255, 75, 43, 0.2); }
+
+        .loader {
+            border: 3px solid rgba(255,255,255,0.1);
+            border-top: 3px solid var(--aura-primary);
+            border-radius: 50%; width: 45px; height: 45px;
+            animation: spin 1s linear infinite;
+            margin: 25px auto;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<div class="glow"></div>
+
+<div class="order-container">
+    
+    <div class="step active" id="step1">
+        <h2>Nuovo Progetto</h2>
+        <p>Scegli il piano ideale per le tue esigenze.</p>
+        <select id="plan">
+            <option value="" disabled selected>Seleziona un piano...</option>
+            <optgroup label="🔥 Professionale">
+                <option value="Normal Base (50€)">Normal Base - 50€</option>
+                <option value="Normal Standard (70€)">Normal Standard - 70€</option>
+                <option value="Normal Premium (100€)">Normal Premium - 100€</option>
+            </optgroup>
+            <optgroup label="💸 Budget">
+                <option value="Budget Base (20€)">Budget Base - 20€</option>
+                <option value="Budget Standard (35€)">Budget Standard - 35€</option>
+                <option value="Budget Premium (50€)">Budget Premium - 50€</option>
+            </optgroup>
+        </select>
+        <button class="btn btn-next" onclick="goToStep(2)">Continua</button>
+    </div>
+
+    <div class="step" id="step2">
+        <h2>Riepilogo Dati</h2>
+        <p>Confermando, i seguenti dati verranno trasmessi al team Aura:</p>
+        <div class="data-box">
+            <div class="data-item">Nome: <span id="display-name">...</span></div>
+            <div class="data-item">Cognome: <span id="display-surname">...</span></div>
+            <div class="data-item">Email: <span id="display-email" style="font-size: 0.75rem;">...</span></div>
+            <div class="data-item">Aura UID: <code id="display-uid">...</code></div>
+        </div>
+        <button class="btn btn-next" onclick="submitRequest()">Conferma Ordine</button>
+        <button class="btn btn-cancel" onclick="window.location.href='index.html'">Annulla</button>
+    </div>
+
+    <div class="step" id="step3">
+        <div id="loading">
+            <h2>Elaborazione...</h2>
+            <div class="loader"></div>
+        </div>
+        <div id="success" style="display:none;">
+            <i class="fas fa-rocket" style="font-size: 3rem; color: var(--aura-primary); margin-bottom: 20px;"></i>
+            <h2>Richiesta Ricevuta!</h2>
+            <p>Il team Aura ha preso in carico il tuo ordine. Ti contatteremo presto via email!</p>
+            <button class="btn btn-next" onclick="window.location.href='/index.html'">Vai al sito web</button>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyDsrHAtIh5bsYDHa1wz0LMcmciChAoRikU",
+        authDomain: "myauraid-f03c6.firebaseapp.com",
+        projectId: "myauraid-f03c6",
+        storageBucket: "myauraid-f03c6.appspot.com",
+        messagingSenderId: "190478237725",
+        appId: "1:190478237725:web:0d39907473f511b85a06f4"
+    };
+    
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    let orderData = {};
+
+    auth.onAuthStateChanged(user => {
+        if (!user) {
+            window.location.href = '/index.html'; 
+            return;
+        }
+
+        db.collection('users').doc(user.uid).get().then(doc => {
+            if (doc.exists) {
+                const data = doc.data();
+                orderData = {
+                    uid: user.uid,
+                    nome: data.nome,
+                    cognome: data.cognome,
+                    email: user.email // Presa da Auth (più sicura)
+                };
+                
+                document.getElementById('display-name').textContent = data.nome;
+                document.getElementById('display-surname').textContent = data.cognome;
+                document.getElementById('display-email').textContent = user.email;
+                document.getElementById('display-uid').textContent = user.uid.substring(0, 15) + "...";
+            }
+        });
+    });
+
+    function goToStep(num) {
+        if (num === 2 && !document.getElementById('plan').value) {
+            alert("Scegli un piano prima di continuare.");
+            return;
+        }
+        document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+        document.getElementById('step' + num).classList.add('active');
+    }
+
+    async function submitRequest() {
+        goToStep(3);
+        
+        const payload = {
+            progetto: "Sviluppo Web Aura",
+            piano_scelto: document.getElementById('plan').value,
+            cliente: orderData.nome + " " + orderData.cognome,
+            email_cliente: orderData.email,
+            uid: orderData.uid,
+            timestamp: new Date().toLocaleString('it-IT')
+        };
+
+        const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbxQuA_Fp-rEk3aqrAcfUl_fYqtlvk3loYcbvBjFiVMK7qduCVFOMd3yr8Xk5fDFtfpKjg/exec";
+
+        try {
+            await fetch(WEBHOOK_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: JSON.stringify(payload)
+            });
+
+            setTimeout(() => {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('success').style.display = 'block';
+            }, 1800);
+
+        } catch (error) {
+            console.error("Errore invio:", error);
+            alert("Connessione fallita. Riprova.");
+            goToStep(2);
+        }
+    }
+</script>
+
+</body>
+</html>

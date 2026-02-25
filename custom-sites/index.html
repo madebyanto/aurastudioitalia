@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Siti Web Personalizzati | Aura</title>
+
+    <link rel="icon" type="image/png" href="/images/aura.jpg">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-color: #0b0b0e;
+            --card-bg: rgba(23, 23, 28, 0.8);
+            --text-main: #ffffff;
+            --text-muted: #a1a1a6;
+            --accent: #F05BFF;
+            --accent-hover: #d04ee0;
+            --accent-soft: rgba(240, 91, 255, 0.15);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            --gradient: linear-gradient(135deg, #F05BFF 0%, #7000FF 100%);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth; }
+
+        body {
+            background: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Sfondo Decorativo */
+        body::before {
+            content: '';
+            position: fixed;
+            top: -10%; left: -10%;
+            width: 40%; height: 40%;
+            background: radial-gradient(circle, rgba(240, 91, 255, 0.05) 0%, transparent 70%);
+            z-index: -1;
+        }
+
+        .container { max-width: 1200px; margin: auto; padding: 0 25px; }
+
+        /* HERO SECTION */
+        .hero {
+            text-align: center;
+            padding: 180px 0 100px;
+            animation: fadeIn 1s ease-out;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .hero h1 { font-size: clamp(2.5rem, 8vw, 4rem); font-weight: 800; line-height: 1.1; margin-bottom: 25px; }
+        .highlight { background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        
+        .hero p {
+            max-width: 700px;
+            margin: auto;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            margin-bottom: 45px;
+        }
+
+        /* BUTTONS */
+        .btn {
+            padding: 16px 35px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: inline-block;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-primary {
+            background: var(--gradient);
+            color: white;
+            box-shadow: 0 10px 25px rgba(240, 91, 255, 0.3);
+        }
+        .btn-primary:hover { transform: scale(1.05); box-shadow: 0 15px 30px rgba(240, 91, 255, 0.4); }
+
+        .btn-outline {
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            margin-top: 15px;
+        }
+        .btn-outline:hover { background: var(--border-color); }
+
+        /* SECTION TITLES */
+        section { padding: 100px 0; }
+        .section-header { text-align: center; margin-bottom: 60px; }
+        .section-header h2 { font-size: 2.5rem; margin-bottom: 10px; }
+        .section-header p { color: var(--text-muted); }
+
+        /* GRID & CARDS */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+        
+        .card {
+            background: var(--card-bg);
+            padding: 45px 35px;
+            border-radius: 35px;
+            border: 1px solid var(--border-color);
+            transition: 0.4s;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(10px);
+        }
+        .card:hover {
+            transform: translateY(-12px);
+            border-color: var(--accent);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .badge {
+            position: absolute;
+            top: 20px; right: 20px;
+            background: var(--accent-soft);
+            color: var(--accent);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .price {
+            font-size: 3rem;
+            font-weight: 800;
+            margin: 25px 0;
+            display: flex;
+            align-items: baseline;
+        }
+        .price span { font-size: 1rem; color: var(--text-muted); font-weight: 400; margin-left: 5px; }
+
+        .features { list-style: none; margin: 30px 0; flex-grow: 1; }
+        .features li {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+        .features li i { color: var(--accent); margin-right: 12px; font-size: 1.1rem; }
+
+        /* PROCESS SECTION */
+        .process-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+        }
+        .step {
+            background: var(--card-bg);
+            padding: 40px 30px;
+            border-radius: 30px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+        }
+        .step i {
+            font-size: 2.5rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+
+        /* FAQ */
+        .faq-container { max-width: 800px; margin: auto; }
+        .faq-item {
+            background: var(--card-bg);
+            padding: 25px 30px;
+            border-radius: 20px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+            transition: 0.3s;
+        }
+        .faq-item h3 { font-size: 1.1rem; margin-bottom: 10px; display: flex; align-items: center; }
+        .faq-item h3::before { content: '✦'; color: var(--accent); margin-right: 10px; }
+        .faq-item p { color: var(--text-muted); font-size: 0.95rem; }
+
+        /* CTA BOX */
+        .cta-wrapper {
+            background: var(--gradient);
+            padding: 80px 40px;
+            border-radius: 50px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(240, 91, 255, 0.2);
+        }
+        .cta-wrapper h2 { font-size: 2.5rem; margin-bottom: 15px; color: #fff; }
+        .cta-wrapper p { margin-bottom: 30px; color: rgba(255,255,255,0.9); font-size: 1.1rem; }
+        .cta-wrapper .btn-primary { background: #fff; color: var(--accent); }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.8rem; }
+            .card { padding: 30px 25px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <header class="hero">
+        <h1>Eleva la tua Visione con <span class="highlight">Aura Custom Websites</span></h1>
+        <p>Sviluppiamo esperienze digitali sartoriali. Dalla landing page per il tuo budget al portale enterprise ad alte prestazioni.</p>
+        <div class="hero-btns">
+            <a href="#piani" class="btn btn-primary">Guarda i Listini</a>
+            <a href="https://support.aurastudioitalia.it" class="btn btn-outline" style="margin-left: 10px;">Parla con noi</a>
+        </div>
+    </header>
+
+    <section id="piani">
+        <div class="section-header">
+            <span style="color:var(--accent); font-weight:600; letter-spacing: 2px;">SOLUZIONI PROFESSIONALI</span>
+            <h2>Piani 🔥 <span class="highlight">Normal</span></h2>
+            <p>Ideali per professionisti e aziende che cercano il massimo impatto visivo.</p>
+        </div>
+
+        <div class="card-grid">
+            <div class="card">
+                <h3>Normal Base</h3>
+                <div class="price">50€<span>/progetto</span></div>
+                <ul class="features">
+                    <li><i class="fa-solid fa-check"></i> 3 Pagine personalizzate</li>
+                    <li><i class="fa-solid fa-check"></i> Design moderno & responsive</li>
+                    <li><i class="fa-solid fa-check"></i> Hosting Netlify (setup)</li>
+                    <li><i class="fa-solid fa-check"></i> Consegna codice sorgente</li>
+                </ul>
+                <a href="login.html" class="btn btn-outline">Seleziona</a>
+            </div>
+
+            <div class="card" style="border-color: var(--accent);">
+                <span class="badge">Consigliato</span>
+                <h3>Normal Standard</h3>
+                <div class="price">70€<span>/progetto</span></div>
+                <ul class="features">
+                    <li><i class="fa-solid fa-check"></i> 5 Pagine Full-Design</li>
+                    <li><i class="fa-solid fa-check"></i> Form contatti avanzato</li>
+                    <li><i class="fa-solid fa-check"></i> Ottimizzazione SEO base</li>
+                    <li><i class="fa-solid fa-check"></i> Integrazione Firebase</li>
+                    <li><i class="fa-solid fa-check"></i> Supporto post-lancio</li>
+                </ul>
+                <a href="login.html" class="btn btn-primary">Inizia Ora</a>
+            </div>
+
+            <div class="card">
+                <h3>Normal Premium</h3>
+                <div class="price">100€<span>/progetto</span></div>
+                <ul class="features">
+                    <li><i class="fa-solid fa-check"></i> Fino a 10 Pagine</li>
+                    <li><i class="fa-solid fa-check"></i> Dashboard Gestione Dati</li>
+                    <li><i class="fa-solid fa-check"></i> Performance High-Speed</li>
+                    <li><i class="fa-solid fa-check"></i> Animazioni Premium</li>
+                    <li><i class="fa-solid fa-check"></i> Form dinamici illimitati</li>
+                </ul>
+                <a href="login.html" class="btn btn-outline">Contattaci</a>
+            </div>
+        </div>
+
+        <div class="section-header" style="margin-top: 80px;">
+            <span style="color:var(--text-muted); font-weight:600; letter-spacing: 2px;">ENTRY LEVEL</span>
+            <h2>Piani 💸 <span class="highlight">Budget</span></h2>
+            <p>Soluzioni rapide ed economiche per partire subito.</p>
+        </div>
+
+        <div class="card-grid">
+            <div class="card">
+                <h3>Budget Base</h3>
+                <div class="price">20€</div>
+                <ul class="features">
+                    <li><i class="fa-solid fa-bolt"></i> 1-2 Pagine Essenziali</li>
+                    <li><i class="fa-solid fa-bolt"></i> Layout Pulito</li>
+                    <li><i class="fa-solid fa-bolt"></i> Hosting Incluso</li>
+                </ul>
+                <a href="login.html" class="btn btn-outline">Richiedi</a>
+            </div>
+
+            <div class="card">
+                <h3>Budget Standard</h3>
+                <div class="price">35€</div>
+                <ul class="features">
+                    <li><i class="fa-solid fa-bolt"></i> 3 Pagine Strutturate</li>
+                    <li><i class="fa-solid fa-bolt"></i> Form contatti base</li>
+                    <li><i class="fa-solid fa-bolt"></i> Setup in 48 ore</li>
+                </ul>
+                <a href="login.html" class="btn btn-outline">Richiedi</a>
+            </div>
+
+            <div class="card">
+                <h3>Budget Premium</h3>
+                <div class="price">50€</div>
+                <ul class="features">
+                    <li><i class="fa-solid fa-bolt"></i> 5 Pagine complete</li>
+                    <li><i class="fa-solid fa-bolt"></i> Piccole Interattività</li>
+                    <li><i class="fa-solid fa-bolt"></i> Design semi-custom</li>
+                </ul>
+                <a href="login.html" class="btn btn-outline">Richiedi</a>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="section-header">
+            <h2>Il nostro <span class="highlight">Metodo</span></h2>
+            <p>Dall'idea al lancio in 4 semplici step.</p>
+        </div>
+        <div class="process-container">
+            <div class="step">
+                <i class="fa-solid fa-comment-dots"></i>
+                <h3>1. Briefing</h3>
+                <p>Analizziamo le tue necessità e i tuoi gusti estetici.</p>
+            </div>
+            <div class="step">
+                <i class="fa-solid fa-file-invoice-dollar"></i>
+                <h3>2. Setup</h3>
+                <p>Definiamo i dettagli e blocchiamo lo slot di sviluppo.</p>
+            </div>
+            <div class="step">
+                <i class="fa-solid fa-code"></i>
+                <h3>3. Build</h3>
+                <p>Scriviamo codice pulito e ottimizzato per i motori di ricerca.</p>
+            </div>
+            <div class="step">
+                <i class="fa-solid fa-rocket"></i>
+                <h3>4. Launch</h3>
+                <p>Ti consegniamo le chiavi del tuo nuovo spazio digitale.</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <div class="section-header">
+            <h2>Domande Frequenti</h2>
+        </div>
+        <div class="faq-container">
+            <div class="faq-item">
+                <h3>Il dominio è incluso?</h3>
+                <p>Un dominio personalizzato (es: nomesito.it) non è incluso nel prezzo, ma configuriamo gratuitamente il puntamento ad una repository Netlify apposita che poi ti trasferiremo.</p>
+            </div>
+            <div class="faq-item">
+                <h3>Supporto post-vendita?</h3>
+                <p>Certamente. Inclusi in ogni piano ci sono 14 giorni di assistenza gratuita per piccoli fix o correzioni testi.</p>
+            </div>
+            <div class="faq-item">
+                <h3>Create siti web con funzioni di pagamento integrate, configurazioni server terzi, ecc...</h3>
+                <p>Parzialmente. Ci occupiamo di siti web con integrazione di Firebase e librerie come FontAwesome, ecc...</p>
+            </div>
+        </div>
+    </section>
+
+    <section style="padding-bottom: 150px;">
+        <div class="cta-wrapper">
+            <h2>Pronto a trasformare il tuo brand?</h2>
+            <p>Unisciti ai clienti che hanno già scelto Aura per la loro presenza online.</p>
+            <a href="login.html" class="btn btn-primary">Inizia il Progetto</a>
+        </div>
+    </section>
+
+</div>
+
+</body>
+</html>
