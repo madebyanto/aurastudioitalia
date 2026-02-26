@@ -12,7 +12,6 @@
     
     <style>
         :root {
-            /* Theme: Light (Default) */
             --bg-color: #f8f9fa;
             --card-bg: rgba(255, 255, 255, 0.7);
             --text-main: #2d3436;
@@ -20,8 +19,8 @@
             --accent: #F05BFF;
             --accent-soft: rgba(240, 91, 255, 0.1);
             --nav-bg: rgba(255, 255, 255, 0.8);
-            --border-color: rgba(0,0,0,0.05);
-            --shadow: 0 10px 30px rgba(0,0,0,0.05);
+            --border-color: rgba(0,0,0,0.06);
+            --shadow: 0 10px 30px rgba(0,0,0,0.06);
             --grid-color: rgba(240, 91, 255, 0.07);
         }
 
@@ -31,8 +30,8 @@
                 --card-bg: rgba(30, 30, 35, 0.7);
                 --text-main: #f5f5f7;
                 --text-muted: #a1a1a6;
-                --nav-bg: rgba(15, 15, 18, 0.8);
-                --border-color: rgba(255,255,255,0.05);
+                --nav-bg: rgba(15, 15, 18, 0.85);
+                --border-color: rgba(255,255,255,0.06);
                 --shadow: 0 10px 40px rgba(0,0,0,0.3);
                 --grid-color: rgba(240, 91, 255, 0.1);
             }
@@ -49,46 +48,57 @@
             overflow-x: hidden;
         }
 
-        /* Glassmorphism Grid Background */
+        /* Grid Background */
         .glass-grid {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 800px; /* Copre la parte superiore */
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100vh;
             background-image: 
                 linear-gradient(var(--grid-color) 1px, transparent 1px),
                 linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
             background-size: 40px 40px;
-            mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
-            -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+            mask-image: linear-gradient(to bottom, black 0%, transparent 80%);
+            -webkit-mask-image: linear-gradient(to bottom, black 0%, transparent 80%);
             z-index: -1;
             pointer-events: none;
         }
 
-        /* Soft Decorative Background Blobs */
+        /* Blob decorativi */
         body::before {
             content: "";
             position: fixed;
-            top: -10%; left: -10%;
-            width: 40%; height: 40%;
+            top: -15%; left: -10%;
+            width: 45%; height: 45%;
             background: radial-gradient(circle, var(--accent-soft) 0%, transparent 70%);
             z-index: -2;
+            animation: blobDrift 20s ease-in-out infinite alternate;
+        }
+        body::after {
+            content: "";
+            position: fixed;
+            bottom: -10%; right: -5%;
+            width: 35%; height: 35%;
+            background: radial-gradient(circle, var(--accent-soft) 0%, transparent 70%);
+            z-index: -2;
+            animation: blobDrift 25s ease-in-out infinite alternate-reverse;
+        }
+        @keyframes blobDrift {
+            from { transform: translate(0, 0) scale(1); }
+            to   { transform: translate(30px, 20px) scale(1.1); }
         }
 
         .container {
             max-width: 1100px;
             margin: 0 auto;
             padding: 0 25px;
-            position: relative;
         }
 
-        /* --- Header --- */
+        /* ─── Header ─── */
         .main-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px 25px;
+            padding: 12px 22px;
             position: fixed;
             top: 20px;
             left: 50%;
@@ -97,149 +107,376 @@
             max-width: 1100px;
             z-index: 1000;
             background: var(--nav-bg);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border-radius: 50px;
             border: 1px solid var(--border-color);
-            box-shadow: var(--shadow);
+            box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,0.1);
+            transition: top 0.3s ease, padding 0.3s ease;
         }
+        .main-header.scrolled { top: 10px; }
 
-        .logo img { max-height: 40px; border-radius: 50%; }
+        .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+        .logo img { max-height: 38px; border-radius: 50%; }
+        .logo-name { font-weight: 800; font-size: 1rem; color: var(--text-main); }
 
         .menu-btn {
             background: none;
             border: none;
             cursor: pointer;
-            padding: 5px;
+            padding: 6px;
             display: flex;
             flex-direction: column;
-            gap: 4px;
+            gap: 5px;
             outline: none;
         }
-    
-        .menu-btn span { 
-            width: 24px; 
-            height: 2px; 
+        .menu-btn span {
+            width: 24px; height: 2px;
             background: var(--text-main);
-            border-radius: 2px; 
+            border-radius: 2px;
             transition: 0.3s;
+            transform-origin: center;
         }
+        .menu-btn.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        .menu-btn.active span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+        .menu-btn.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
-        /* --- Sidebar --- */
+        /* ─── Sidebar ─── */
+        .sidebar-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.35);
+            backdrop-filter: blur(4px);
+            z-index: 1500;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s;
+        }
+        .sidebar-overlay.visible { opacity: 1; pointer-events: all; }
+
         .sidebar {
             position: fixed;
             top: 0; right: -100%;
             width: 300px; height: 100%;
             background: var(--nav-bg);
             backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             z-index: 2000;
-            padding: 40px;
-            transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            padding: 40px 32px;
+            transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
             border-left: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
         }
         .sidebar.open { right: 0; }
-        .sidebar ul { list-style: none; margin-top: 60px; }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+        .sidebar-brand { font-weight: 800; font-size: 1.1rem; color: var(--accent); }
+
+        .close-menu-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            width: 36px; height: 36px;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-muted);
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .close-menu-btn:hover { color: var(--text-main); background: var(--accent-soft); border-color: var(--accent); }
+
+        .sidebar ul { list-style: none; flex: 1; }
+        .sidebar ul li {
+            border-bottom: 1px solid var(--border-color);
+            opacity: 0;
+            transform: translateX(16px);
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        .sidebar.open ul li { opacity: 1; transform: translateX(0); }
+        .sidebar.open ul li:nth-child(1) { transition-delay: 0.05s; }
+        .sidebar.open ul li:nth-child(2) { transition-delay: 0.10s; }
+        .sidebar.open ul li:nth-child(3) { transition-delay: 0.15s; }
+        .sidebar.open ul li:nth-child(4) { transition-delay: 0.20s; }
+        .sidebar.open ul li:nth-child(5) { transition-delay: 0.25s; }
+        .sidebar.open ul li:nth-child(6) { transition-delay: 0.30s; }
+        .sidebar.open ul li:nth-child(7) { transition-delay: 0.35s; }
+
         .sidebar ul li a {
-            color: var(--text-main);
+            color: var(--text-muted);
             text-decoration: none;
-            font-size: 1.1rem;
+            font-size: 0.95rem;
             font-weight: 600;
             display: flex;
             align-items: center;
-            gap: 15px;
-            padding: 15px 0;
-            transition: 0.3s;
+            gap: 14px;
+            padding: 14px 0;
+            transition: all 0.25s;
         }
-        .sidebar ul li a:hover { color: var(--accent); transform: translateX(10px); }
-        .sidebar ul li a img { width: 20px; filter: grayscale(1) invert(0.5); }
+        .sidebar ul li a:hover { color: var(--accent); padding-left: 6px; }
+        .sidebar ul li a .nav-icon {
+            width: 30px; height: 30px;
+            background: var(--accent-soft);
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px;
+            color: var(--accent);
+            flex-shrink: 0;
+            transition: 0.2s;
+        }
+        .sidebar ul li a:hover .nav-icon { background: var(--accent); color: white; }
 
-        .close-menu-btn { background: none; border: none; font-size: 30px; color: var(--text-main); cursor: pointer; float: right; }
+        .sidebar-footer {
+            padding-top: 24px;
+            border-top: 1px solid var(--border-color);
+        }
+        .sidebar-footer a {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .sidebar-footer a:hover { color: var(--accent); }
 
-        /* --- Hero Section --- */
+        /* ─── Hero ─── */
         .hero {
-            padding: 180px 0 100px;
+            padding: 185px 0 100px;
             text-align: center;
         }
-        h1 { font-size: clamp(2.5rem, 8vw, 4rem); font-weight: 800; line-height: 1.1; margin-bottom: 25px; }
-        .highlight { color: var(--accent); }
-        .hero p { max-width: 600px; margin: 0 auto 40px; color: var(--text-muted); font-size: 1.1rem; }
 
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px 6px 10px;
+            border-radius: 50px;
+            border: 1px solid rgba(240, 91, 255, 0.25);
+            background: var(--accent-soft);
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 28px;
+            animation: fadeUp 0.7s ease both;
+        }
+        .hero-badge-dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--accent);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.7); }
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            font-weight: 800;
+            line-height: 1.08;
+            margin-bottom: 24px;
+            animation: fadeUp 0.7s 0.1s ease both;
+        }
+
+        .highlight {
+            background: linear-gradient(135deg, #F05BFF, #b44fff, #F05BFF);
+            background-size: 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 5s ease-in-out infinite;
+        }
+        @keyframes shimmer {
+            0%, 100% { background-position: 0%; }
+            50% { background-position: 100%; }
+        }
+
+        .hero p {
+            max-width: 580px;
+            margin: 0 auto 42px;
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            font-weight: 300;
+            animation: fadeUp 0.7s 0.2s ease both;
+        }
+
+        .hero-buttons { animation: fadeUp 0.7s 0.3s ease both; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ─── Buttons ─── */
         .btn {
-            padding: 14px 32px;
+            padding: 13px 28px;
             border-radius: 30px;
             text-decoration: none;
             font-weight: 600;
-            transition: 0.3s;
-            display: inline-block;
-            margin: 10px;
+            font-size: 0.9rem;
+            transition: all 0.25s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin: 8px;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            border: none;
         }
-        .btn-primary { background: var(--accent); color: white; box-shadow: 0 10px 20px rgba(240, 91, 255, 0.3); }
-        .btn-primary:hover { transform: translateY(-3px); opacity: 0.9; }
-        .btn-secondary { border: 1px solid var(--border-color); color: var(--text-main); background: var(--card-bg); }
-        .btn-secondary:hover { background: var(--accent-soft); border-color: var(--accent); }
-
-        /* --- Sections & Cards --- */
-        section { padding: 80px 0; }
-        h2 { font-size: 2.2rem; margin-bottom: 40px; text-align: center; }
-
-        .card-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 30px;
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 8px 24px rgba(240, 91, 255, 0.3);
         }
-        .card {
-            background: var(--card-bg);
-            padding: 40px 30px;
-            border-radius: 30px;
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 14px 36px rgba(240, 91, 255, 0.4);
+        }
+        .btn-secondary {
             border: 1px solid var(--border-color);
-            text-align: center;
-            transition: 0.3s;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
+            color: var(--text-main);
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
         }
-        .card:hover { transform: translateY(-10px); box-shadow: var(--shadow); border-color: var(--accent-soft); }
-        .card-icon-container img { width: 80px; height: 80px; border-radius: 20px; margin-bottom: 20px; }
-        .card h3 { margin-bottom: 15px; font-size: 1.4rem; }
-        .card p { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 25px; }
+        .btn-secondary:hover {
+            background: var(--accent-soft);
+            border-color: rgba(240, 91, 255, 0.3);
+            transform: translateY(-2px);
+        }
 
-        /* --- Special Info Sections --- */
+        /* ─── Sections ─── */
+        section { padding: 80px 0; }
+        h2 { font-size: clamp(1.7rem, 4vw, 2.3rem); font-weight: 800; margin-bottom: 40px; text-align: center; }
+
+        /* ─── Two Columns ─── */
         .two-columns {
             display: grid;
             grid-template-columns: 1fr 1fr;
             align-items: center;
-            gap: 60px;
+            gap: 56px;
             background: var(--card-bg);
-            padding: 50px;
-            border-radius: 40px;
+            padding: 52px;
+            border-radius: 36px;
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+        .two-columns::after {
+            content: '';
+            position: absolute;
+            top: -80px; right: -80px;
+            width: 280px; height: 280px;
+            background: radial-gradient(circle, var(--accent-soft), transparent 70%);
+            pointer-events: none;
+        }
+
+        .info-image img {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 16px;
+            box-shadow: 0 24px 60px rgba(0,0,0,0.12);
+        }
+
+        .info-text { text-align: left; position: relative; z-index: 1; }
+        .info-text h2 { text-align: left; margin-bottom: 16px; }
+        .info-text p { color: var(--text-muted); font-weight: 300; margin-bottom: 28px; }
+
+        /* Stats */
+        .stats-row { display: flex; gap: 32px; margin-bottom: 24px; }
+        .stat-value { font-size: 1.8rem; font-weight: 800; color: var(--accent); line-height: 1; }
+        .stat-label { font-size: 0.72rem; color: var(--text-muted); margin-top: 4px; font-weight: 400; }
+
+        /* ─── Cards ─── */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 36px 28px;
+            border-radius: 28px;
+            border: 1px solid var(--border-color);
+            text-align: left;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 28px;
+            background: linear-gradient(135deg, var(--accent-soft), transparent 60%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 24px 60px rgba(0,0,0,0.1), 0 0 0 1px rgba(240,91,255,0.15);
+            border-color: rgba(240, 91, 255, 0.2);
+        }
+        .card:hover::before { opacity: 1; }
+
+        .card-icon-container { margin-bottom: 20px; position: relative; z-index: 1; }
+        .card-icon-container img {
+            width: 56px; height: 56px;
+            border-radius: 14px;
             border: 1px solid var(--border-color);
         }
-        
-        .info-image img { width: 100%; max-width: 400px; border-radius: 10px; box-shadow: var(--shadow); }
-        .info-text { text-align: left; }
-        .info-text h2 { text-align: left; margin-bottom: 20px; }
+        .card h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 10px; position: relative; z-index: 1; }
+        .card p {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            font-weight: 300;
+            flex: 1;
+            margin-bottom: 22px;
+            position: relative;
+            z-index: 1;
+            line-height: 1.7;
+        }
+        .card .btn { margin: 0; position: relative; z-index: 1; align-self: flex-start; }
 
-        /* --- Social & Stay In --- */
-        .stay-in-buttons { display: flex; gap: 15px; margin-top: 30px; }
+        /* ─── Stay In ─── */
+        .stay-in-buttons { display: flex; gap: 12px; margin-top: 28px; }
         .stay-btn {
             flex: 1;
-            padding: 12px;
-            border-radius: 15px;
+            padding: 13px 16px;
+            border-radius: 14px;
             text-decoration: none;
             color: white;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 9px;
             font-weight: 600;
+            font-size: 0.875rem;
+            transition: all 0.25s;
         }
-        .whatsapp { background: #25D366; }
-        .discord { background: #5865F2; }
+        .stay-btn:hover { transform: translateY(-3px); filter: brightness(1.1); }
+        .whatsapp { background: linear-gradient(135deg, #25D366, #128C7E); box-shadow: 0 8px 20px rgba(37,211,102,0.2); }
+        .discord  { background: linear-gradient(135deg, #5865F2, #4752C4); box-shadow: 0 8px 20px rgba(88,101,242,0.2); }
 
-        /* --- Footer Modern Design --- */
+        /* ─── Reveal ─── */
+        .reveal {
+            opacity: 0;
+            transform: translateY(28px);
+            transition: opacity 0.65s ease, transform 0.65s ease;
+        }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+
+        /* ─── Footer ─── */
         footer {
-            padding: 80px 0 40px;
-            background: var(--bg-color);
+            padding: 72px 0 36px;
             border-top: 1px solid var(--border-color);
             margin-top: 50px;
         }
@@ -249,100 +486,88 @@
             grid-template-columns: 1.5fr 1fr 1fr 1fr;
             gap: 40px;
             text-align: left;
-            margin-bottom: 50px;
+            margin-bottom: 48px;
         }
 
-        .footer-brand .footer-logo {
-            max-height: 50px;
-            border-radius: 50%;
-            margin-bottom: 20px;
+        .footer-brand .footer-logo-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
         }
+        .footer-brand .footer-logo-wrap img { max-height: 38px; border-radius: 50%; }
+        .footer-brand .footer-logo-wrap span { font-weight: 800; font-size: 1rem; }
 
         .footer-brand p {
             color: var(--text-muted);
-            font-size: 0.95rem;
-            max-width: 300px;
-            margin-bottom: 25px;
-            line-height: 1.5;
+            font-size: 0.875rem;
+            max-width: 280px;
+            margin-bottom: 22px;
+            font-weight: 300;
+            line-height: 1.65;
         }
 
-        .footer-col h4 {
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-bottom: 20px;
-            color: var(--text-main);
-        }
-
-        .footer-col ul {
-            list-style: none;
-        }
-
-        .footer-col ul li {
-            margin-bottom: 12px;
-        }
-
-        .footer-col ul li a {
-            text-decoration: none;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            transition: 0.3s;
-        }
-
-        .footer-col ul li a:hover {
-            color: var(--accent);
-            padding-left: 5px;
-        }
-
-        .footer-socials {
-            display: flex;
-            gap: 15px;
-        }
-
+        .footer-socials { display: flex; gap: 10px; }
         .social-icon {
-            width: 45px; 
-            height: 45px;
+            width: 40px; height: 40px;
             background: var(--card-bg);
-            border-radius: 12px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            display: flex; justify-content: center; align-items: center;
             color: var(--text-muted);
             text-decoration: none;
-            transition: all 0.3s ease;
-            border: 1px solid var(--border-color);
+            font-size: 15px;
+            transition: all 0.25s;
         }
         .social-icon:hover {
             background: var(--accent);
-            transform: translateY(-3px) rotate(5deg);
             border-color: var(--accent);
-            color: #4b0082;
+            color: white;
+            transform: translateY(-3px);
         }
 
+        .footer-col h4 {
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 18px;
+        }
+        .footer-col ul { list-style: none; }
+        .footer-col ul li { margin-bottom: 10px; }
+        .footer-col ul li a {
+            text-decoration: none;
+            color: var(--text-main);
+            font-size: 0.875rem;
+            font-weight: 400;
+            opacity: 0.75;
+            transition: all 0.2s;
+        }
+        .footer-col ul li a:hover { opacity: 1; color: var(--accent); padding-left: 4px; }
+
         .footer-bottom {
-            padding-top: 30px;
+            padding-top: 28px;
             border-top: 1px solid var(--border-color);
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 20px;
+            gap: 16px;
         }
+        .footer-credit { font-size: 0.8rem; color: var(--text-muted); }
 
-        .footer-credit {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-        }
-
-        /* --- Mobile Responsive --- */
+        /* ─── Mobile ─── */
         @media (max-width: 768px) {
-            .two-columns { grid-template-columns: 1fr; text-align: center; padding: 30px; }
+            .two-columns { grid-template-columns: 1fr; text-align: center; padding: 32px; gap: 32px; }
             .info-text { text-align: center; }
             .info-text h2 { text-align: center; }
-            .hero { padding-top: 140px; }
-            .main-header { top: 10px; width: 95%; }
+            .stats-row { justify-content: center; }
+            .hero { padding-top: 145px; }
+            .main-header { top: 10px; width: 94%; }
             .stay-in-buttons { flex-direction: column; }
             .footer-grid { grid-template-columns: 1fr 1fr; }
-            .footer-brand { grid-column: span 2; margin-bottom: 20px; }
+            .footer-brand { grid-column: span 2; margin-bottom: 10px; }
             .footer-bottom { flex-direction: column; text-align: center; }
         }
     </style>
@@ -351,10 +576,12 @@
 
     <div class="glass-grid"></div>
 
-    <header class="main-header">
-        <div class="logo">
+    <!-- Header -->
+    <header class="main-header" id="header">
+        <a class="logo" href="index.html">
             <img src="images/aura.jpg" alt="Aura Logo">
-        </div>
+            <span class="logo-name">Aura</span>
+        </a>
         <button id="open-menu" class="menu-btn" aria-label="Apri menu">
             <span></span>
             <span></span>
@@ -362,22 +589,54 @@
         </button>
     </header>
 
+    <!-- Overlay -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!-- Sidebar -->
     <nav id="sidebar" class="sidebar">
-        <button id="close-menu" class="close-menu-btn">&times;</button>
+        <div class="sidebar-header">
+            <span class="sidebar-brand">Aura</span>
+            <button id="close-menu" class="close-menu-btn">&times;</button>
+        </div>
         <ul>
-            <li><a href="index.html"><img src="images/svg/home.svg" alt=""> Home</a></li>
-            <li><a href="https://apps.aurastudioitalia.it"><img src="images/svg/account.svg" alt=""> Account</a></li>
-            <li><a href="staffapp.html"><img src="images/svg/work.svg" alt=""> Lavora con noi</a></li>
-            <li><a href="progetti.html"><img src="images/svg/services.svg" alt=""> Servizi</a></li>
-            <li><a href="https://support.aurastudioitalia.it"><img src="images/svg/support.svg" alt=""> Supporto</a></li>
-            <li><a href="custom-sites/index.html"><img src="images/svg/website.svg" alt=""> Ordina il tuo sito web</a></li>
-            <hr style="opacity: 0.1; margin: 10px 0;">
-            <li><a href="https://privacy.aurastudioitalia.it" style="font-size: 0.9rem; opacity: 0.7;">Privacy</a></li>
+            <li><a href="index.html">
+                <span class="nav-icon"><i class="fa-solid fa-house"></i></span>
+                Home
+            </a></li>
+            <li><a href="https://apps.aurastudioitalia.it">
+                <span class="nav-icon"><i class="fa-solid fa-user"></i></span>
+                Account
+            </a></li>
+            <li><a href="staffapp.html">
+                <span class="nav-icon"><i class="fa-solid fa-briefcase"></i></span>
+                Lavora con noi
+            </a></li>
+            <li><a href="progetti.html">
+                <span class="nav-icon"><i class="fa-solid fa-cube"></i></span>
+                Servizi
+            </a></li>
+            <li><a href="https://support.aurastudioitalia.it">
+                <span class="nav-icon"><i class="fa-solid fa-headset"></i></span>
+                Supporto
+            </a></li>
+            <li><a href="custom-sites/index.html">
+                <span class="nav-icon"><i class="fa-solid fa-globe"></i></span>
+                Ordina il tuo sito web
+            </a></li>
         </ul>
+        <div class="sidebar-footer">
+            <a href="https://privacy.aurastudioitalia.it">Privacy</a>
+        </div>
     </nav>
 
     <main class="container">
+
+        <!-- Hero -->
         <section class="hero">
+            <div class="hero-badge">
+                <span class="hero-badge-dot"></span>
+                Collettivo italiano di giovani sviluppatori
+            </div>
             <h1>Senti l'energia di <br><span class="highlight">Aura</span></h1>
             <p>Siamo un collettivo italiano di giovani sviluppatori. Creiamo soluzioni digitali per connettere persone e semplificare la quotidianità attraverso il software.</p>
             <div class="hero-buttons">
@@ -386,51 +645,72 @@
             </div>
         </section>
 
+        <!-- Chi Siamo -->
         <section id="why-aura">
-            <div class="two-columns">
+            <div class="two-columns reveal">
                 <div class="info-image">
                     <img src="images/aura-grafic-1.png" alt="Visione Aura">
                 </div>
                 <div class="info-text">
                     <h2>Innovazione guidata dalla <span class="highlight">Passione</span></h2>
+                    <div class="stats-row">
+                        <div>
+                            <div class="stat-value">3+</div>
+                            <div class="stat-label">Anni attivi</div>
+                        </div>
+                        <div>
+                            <div class="stat-value">10+</div>
+                            <div class="stat-label">Progetti</div>
+                        </div>
+                        <div>
+                            <div class="stat-value">🇮🇹</div>
+                            <div class="stat-label">100% italiano</div>
+                        </div>
+                    </div>
                     <p>Non siamo solo "ragazzi che programmano". Aura è un ecosistema pensato per chi vuole strumenti moderni, sicuri e belli da usare. Unisciti alla nostra community per dare forma al futuro insieme a noi.</p>
                     <a href="timeline.html" class="btn btn-secondary" style="margin-left: 0;">Leggi la nostra storia</a>
                 </div>
             </div>
         </section>
 
+        <!-- Servizi -->
         <section id="services">
             <h2>I nostri <span class="highlight">Servizi</span></h2>
             <div class="card-grid">
-                <div class="card">
+                <div class="card reveal">
                     <div class="card-icon-container"><img src="images/aura.jpg" alt="Aura+"></div>
                     <h3>Aura Launchboard</h3>
-                    <p>Tutti i servizi Aura in un unico posto.</p>
+                    <p>Tutti i servizi Aura in un unico posto. La tua dashboard per gestire account e strumenti.</p>
                     <a href="https://apps.aurastudioitalia.it" class="btn btn-secondary">Vai</a>
                 </div>
-                <div class="card">
+                <div class="card reveal" style="transition-delay: 0.1s;">
                     <div class="card-icon-container"><img src="images/apps/nyra.png" alt="Nyra AI"></div>
                     <h3>Nyra AI</h3>
                     <p>La nostra intelligenza artificiale basata su modelli avanzati per assistenza e supporto smart.</p>
                     <a href="https://nyra.aurastudioitalia.it" class="btn btn-secondary">Prova Nyra</a>
                 </div>
-                <div class="card">
+                <div class="card reveal" style="transition-delay: 0.2s;">
                     <div class="card-icon-container"><img src="images/apps/others.png" alt="Altro"></div>
                     <h3>Altro</h3>
-                    <p>Esplora di più dell'ecosistema Aura!</p>
+                    <p>Esplora di più dell'ecosistema Aura! Tanti altri strumenti e progetti ti aspettano.</p>
                     <a href="progetti.html" class="btn btn-secondary">Esplora di più!</a>
                 </div>
             </div>
         </section>
 
+        <!-- Stay In -->
         <section>
-            <div class="two-columns" style="background: var(--accent-soft); border-color: var(--accent);">
+            <div class="two-columns reveal" style="background: var(--accent-soft); border-color: rgba(240,91,255,0.2);">
                 <div class="info-text">
                     <h2>Resta <span class="highlight">aggiornato</span> 🔥</h2>
                     <p>Ricevi in anteprima novità, sfide esclusive e aggiornamenti sui rilasci direttamente sui tuoi canali preferiti.</p>
                     <div class="stay-in-buttons">
-                        <a href="https://whatsapp.com/channel/0029VanxEbwL2AU4MyDa1x1n" class="stay-btn whatsapp"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a>
-                        <a href="https://discord.gg/JQJyEuufU9" class="stay-btn discord"><i class="fa-brands fa-discord"></i> Discord</a>
+                        <a href="https://whatsapp.com/channel/0029VanxEbwL2AU4MyDa1x1n" class="stay-btn whatsapp">
+                            <i class="fa-brands fa-whatsapp"></i> WhatsApp
+                        </a>
+                        <a href="https://discord.gg/JQJyEuufU9" class="stay-btn discord">
+                            <i class="fa-brands fa-discord"></i> Discord
+                        </a>
                     </div>
                 </div>
                 <div class="info-image">
@@ -438,13 +718,18 @@
                 </div>
             </div>
         </section>
+
     </main>
 
+    <!-- Footer -->
     <footer>
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-brand">
-                    <img src="images/aura.jpg" alt="Aura Logo" class="footer-logo">
+                    <div class="footer-logo-wrap">
+                        <img src="images/aura.jpg" alt="Aura Logo">
+                        <span>Aura Studio Italia</span>
+                    </div>
                     <p>Senti l'energia di Aura. Creiamo soluzioni digitali per connettere persone e semplificare la quotidianità.</p>
                     <div class="footer-socials">
                         <a href="https://discord.gg/JQJyEuufU9" class="social-icon"><i class="fa-brands fa-discord"></i></a>
@@ -484,39 +769,62 @@
             </div>
 
             <div class="footer-bottom">
-                <p class="footer-credit">
-                    © 2026 Aura Studio Italia &bull; Multi-Sede (Eboli, Conversano)
-                </p>
-                <p class="footer-credit" style="opacity: 0.6;">
-                    v1.3 &bull; <span id="gpu-info"></span>
-                </p>
+                <p class="footer-credit">© 2026 Aura Studio Italia &bull; Multi-Sede (Eboli, Conversano)</p>
+                <p class="footer-credit" style="opacity: 0.5;">v1.3 &bull; <span id="gpu-info"></span></p>
             </div>
         </div>
     </footer>
 
     <script>
-        // Menu Toggle
+        // Sidebar
         const sidebar = document.getElementById('sidebar');
-        const openBtn = document.getElementById('open-menu');
+        const overlay = document.getElementById('sidebar-overlay');
+        const openBtn  = document.getElementById('open-menu');
         const closeBtn = document.getElementById('close-menu');
 
-        openBtn.onclick = () => sidebar.classList.add('open');
-        closeBtn.onclick = () => sidebar.classList.remove('open');
+        function openSidebar() {
+            sidebar.classList.add('open');
+            overlay.classList.add('visible');
+            openBtn.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeSidebar() {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('visible');
+            openBtn.classList.remove('active');
+            document.body.style.overflow = '';
+        }
 
-        // Close sidebar when clicking a link
-        document.querySelectorAll('.sidebar a').forEach(link => {
-            link.onclick = () => sidebar.classList.remove('open');
-        });
+        openBtn.addEventListener('click', openSidebar);
+        closeBtn.addEventListener('click', closeSidebar);
+        overlay.addEventListener('click', closeSidebar);
+        document.querySelectorAll('.sidebar a').forEach(l => l.addEventListener('click', closeSidebar));
+
+        // Header scroll
+        const header = document.getElementById('header');
+        window.addEventListener('scroll', () => {
+            header.classList.toggle('scrolled', window.scrollY > 40);
+        }, { passive: true });
+
+        // Scroll reveal
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.classList.add('visible');
+                    observer.unobserve(e.target);
+                }
+            });
+        }, { threshold: 0.12 });
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
         // WebGL Info
-        function getGraphicsInfo() {
-            let canvas = document.createElement("canvas");
-            let gl = canvas.getContext("webgl") || canvas.getContext("experimental-webgl");
-            if (!gl) return "Standard Rendering";
-            let debugInfo = gl.getExtension("WEBGL_debug_renderer_info");
-            return debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : "WebGL";
-        }
-        document.getElementById("gpu-info").innerText = getGraphicsInfo();
+        (function() {
+            const canvas = document.createElement('canvas');
+            const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+            const info = gl ? gl.getExtension('WEBGL_debug_renderer_info') : null;
+            document.getElementById('gpu-info').textContent =
+                info ? gl.getParameter(info.UNMASKED_RENDERER_WEBGL) : 'Standard Rendering';
+        })();
     </script>
 </body>
 </html>
