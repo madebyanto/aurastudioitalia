@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Accedi ad Aura</title>
-    <link rel="icon" href="/images/aura.jpg" type="image/png">
+    <link rel="icon" href="images/aura-nobg.png" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyDsrHAtIh5bsYDHa1wz0LMcmciChAoRikU",
@@ -22,6 +22,7 @@
         };
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
+        const db = firebase.firestore();
         
         // Persistenza Account: Forza il salvataggio locale
         auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL);
@@ -29,7 +30,7 @@
         // Controllo Persistenza: Se l'utente è già loggato e verificato, vai in dashboard
         auth.onAuthStateChanged((user) => {
             if (user && user.emailVerified) {
-                window.location.href = "buy.html";
+                window.location.href = "dashboard.html";
             }
         });
 
@@ -219,7 +220,7 @@
 </div>
 
 <div class="auth-card">
-    <img src="https://apps.aurastudioitalia.it/images/aura-nobg.png" alt="Aura Logo" class="logo">
+    <img src="images/aura-nobg.png" alt="Aura Logo" class="logo">
     
     <div class="tab-group">
         <button id="tab-login" class="tab-btn active">Accedi</button>
@@ -298,7 +299,7 @@
                     showMsg('msg-login', 'Verifica la tua email prima di entrare.', true);
                     await auth.signOut();
                 } else {
-                    window.location.href = "buy.html";
+                    window.location.href = "dashboard.html";
                 }
             })
             .catch(err => showMsg('msg-login', getAuthErrorMessage(normalizeAuthError(err)), true));
@@ -313,10 +314,20 @@
         showMsg('msg-signup', 'Creazione account...');
         auth.createUserWithEmailAndPassword(email, pass)
             .then(async (res) => {
-                await res.user.sendEmailVerification();
-                showMsg('msg-signup', 'Email di verifica inviata! Controlla la posta.');
-                setTimeout(() => tabLogin.click(), 3000);
-            })
+    const user = res.user;
+
+    // 🔥 CREA /users/{UID}
+    await db.collection("users").doc(user.uid).set({
+        nome: document.getElementById('s-nome').value,
+        cognome: document.getElementById('s-cognome').value,
+        saldo: 0
+    });
+
+    await user.sendEmailVerification();
+
+    showMsg('msg-signup', 'Email di verifica inviata! Controlla la posta.');
+    setTimeout(() => tabLogin.click(), 3000);
+})
             .catch(err => showMsg('msg-signup', getAuthErrorMessage(normalizeAuthError(err)), true));
     };
 
