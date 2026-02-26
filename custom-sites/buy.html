@@ -9,171 +9,459 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
     <style>
         :root {
-            --aura-primary: #e008f6;
-            --aura-glow: rgba(224, 8, 246, 0.4);
-            --bg-main: #050505;
-            --text-main: #ffffff;
-            --card-bg: rgba(25, 25, 25, 0.9);
-            --border-glass: rgba(255, 255, 255, 0.1);
+            --bg: #0b0b0e;
+            --card-bg: rgba(22, 22, 27, 0.9);
+            --accent: #F05BFF;
+            --accent-soft: rgba(240, 91, 255, 0.12);
+            --accent-glow: rgba(240, 91, 255, 0.25);
+            --border: rgba(255, 255, 255, 0.07);
+            --border-accent: rgba(240, 91, 255, 0.25);
+            --text: #ffffff;
+            --muted: #a1a1a6;
+            --gradient: linear-gradient(135deg, #F05BFF 0%, #7000FF 100%);
+            --success: #30d158;
         }
 
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
-            background-color: var(--bg-main);
-            color: var(--text-main);
+            background: var(--bg);
+            color: var(--text);
             font-family: 'Poppins', sans-serif;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0;
             overflow: hidden;
+            position: relative;
         }
 
-        .glow {
+        /* ─── Background ─── */
+        .bg-orb {
             position: fixed;
-            width: 600px; height: 600px;
-            background: radial-gradient(circle, var(--aura-primary) 0%, transparent 70%);
+            border-radius: 50%;
             filter: blur(120px);
-            opacity: 0.3;
-            z-index: -1;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .orb-1 {
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(240,91,255,0.18), transparent 70%);
+            top: -150px; left: -150px;
+            animation: drift 18s ease-in-out infinite alternate;
+        }
+        .orb-2 {
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(112,0,255,0.12), transparent 70%);
+            bottom: -100px; right: -100px;
+            animation: drift 24s ease-in-out infinite alternate-reverse;
+        }
+        @keyframes drift {
+            from { transform: translate(0,0); }
+            to   { transform: translate(30px, 20px); }
         }
 
+        .bg-grid {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(240,91,255,0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(240,91,255,0.04) 1px, transparent 1px);
+            background-size: 40px 40px;
+            mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black 20%, transparent 100%);
+            -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black 20%, transparent 100%);
+        }
+
+        /* ─── Card ─── */
         .order-container {
+            position: relative;
+            z-index: 1;
             background: var(--card-bg);
-            backdrop-filter: blur(25px);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
             width: 90%;
             max-width: 460px;
-            padding: 40px;
-            border-radius: 30px;
-            border: 1px solid var(--border-glass);
-            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
-            text-align: center;
+            padding: 44px 40px;
+            border-radius: 32px;
+            border: 1px solid var(--border);
+            box-shadow: 0 30px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04);
         }
 
-        .step { display: none; animation: fadeIn 0.5s ease forwards; }
-        .step.active { display: block; }
+        /* ─── Progress bar ─── */
+        .progress-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 36px;
+        }
+        .progress-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--border);
+            transition: all 0.4s ease;
+            flex-shrink: 0;
+        }
+        .progress-dot.active { background: var(--accent); box-shadow: 0 0 10px var(--accent-glow); }
+        .progress-dot.done { background: var(--accent); opacity: 0.4; }
+        .progress-line {
+            flex: 1; height: 1px;
+            background: var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+        .progress-line::after {
+            content: '';
+            position: absolute;
+            left: 0; top: 0;
+            height: 100%;
+            background: var(--accent);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        .progress-line.filled::after { width: 100%; }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* ─── Steps ─── */
+        .step { display: none; }
+        .step.active {
+            display: block;
+            animation: fadeUp 0.45s ease both;
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(14px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
 
-        h2 { font-weight: 800; margin-bottom: 10px; font-size: 1.8rem; letter-spacing: -0.5px; }
-        p { color: #a1a1a6; font-size: 0.9rem; margin-bottom: 25px; }
+        /* ─── Step header ─── */
+        .step-icon {
+            width: 52px; height: 52px;
+            border-radius: 16px;
+            background: var(--accent-soft);
+            border: 1px solid var(--border-accent);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            background: var(--gradient);
+        }
+        .step-icon i { color: white; }
 
+        h2 {
+            font-weight: 800;
+            font-size: 1.6rem;
+            letter-spacing: -0.02em;
+            margin-bottom: 6px;
+        }
+        .step-desc {
+            color: var(--muted);
+            font-size: 0.875rem;
+            font-weight: 300;
+            margin-bottom: 28px;
+            line-height: 1.6;
+        }
+
+        /* ─── Select ─── */
+        .select-wrapper {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        .select-wrapper::after {
+            content: '\f078';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            right: 18px; top: 50%;
+            transform: translateY(-50%);
+            color: var(--muted);
+            font-size: 0.75rem;
+            pointer-events: none;
+        }
         select {
             width: 100%;
-            padding: 16px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid var(--border-glass);
-            border-radius: 15px;
+            padding: 15px 44px 15px 18px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border);
+            border-radius: 14px;
             color: white;
-            font-size: 1rem;
-            margin-bottom: 20px;
+            font-size: 0.9rem;
+            font-family: 'Poppins', sans-serif;
             outline: none;
             appearance: none;
+            -webkit-appearance: none;
+            transition: border-color 0.25s;
+            cursor: pointer;
         }
+        select:focus { border-color: var(--border-accent); }
+        select option { background: #1a1a1f; color: white; }
+        select optgroup { color: var(--muted); }
 
+        /* ─── Selected plan preview ─── */
+        .plan-preview {
+            background: var(--accent-soft);
+            border: 1px solid var(--border-accent);
+            border-radius: 14px;
+            padding: 14px 18px;
+            margin-bottom: 20px;
+            display: none;
+            align-items: center;
+            gap: 12px;
+        }
+        .plan-preview.visible { display: flex; }
+        .plan-preview-icon {
+            width: 36px; height: 36px;
+            border-radius: 10px;
+            background: var(--gradient);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+        .plan-preview-text { flex: 1; text-align: left; }
+        .plan-preview-name { font-size: 0.875rem; font-weight: 600; }
+        .plan-preview-price { font-size: 0.75rem; color: var(--accent); font-weight: 600; }
+
+        /* ─── Data box ─── */
         .data-box {
-            background: rgba(0,0,0,0.4);
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-accent);
+            border-radius: 18px;
             padding: 20px;
-            border-radius: 20px;
+            margin-bottom: 24px;
             text-align: left;
-            margin-bottom: 25px;
-            border: 1px solid rgba(224, 8, 246, 0.15);
         }
-
-        .data-item { 
-            font-size: 0.85rem; 
-            margin-bottom: 8px; 
-            color: #d1d1d6;
+        .data-box-title {
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 14px;
+        }
+        .data-item {
             display: flex;
             justify-content: space-between;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            padding-bottom: 5px;
+            align-items: center;
+            font-size: 0.85rem;
+            padding: 9px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            color: var(--muted);
         }
-        .data-item:last-child { border-bottom: none; }
-        .data-item span { color: var(--aura-primary); font-weight: 500; }
-        .data-item code { color: #8a8a8e; font-size: 0.75rem; }
+        .data-item:last-child { border-bottom: none; padding-bottom: 0; }
+        .data-item-label { font-weight: 300; }
+        .data-item-value { color: var(--text); font-weight: 600; font-size: 0.82rem; max-width: 200px; text-align: right; overflow: hidden; text-overflow: ellipsis; }
+        .data-item-value.uid { color: var(--muted); font-size: 0.72rem; font-family: monospace; }
+        .data-item-value.plan-value { color: var(--accent); }
 
+        /* ─── Buttons ─── */
         .btn {
             width: 100%;
-            padding: 16px;
+            padding: 15px;
             border-radius: 50px;
             border: none;
             font-weight: 600;
+            font-size: 0.9rem;
             cursor: pointer;
-            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all 0.25s;
             margin-top: 10px;
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
-        .btn-next { background: var(--aura-primary); color: white; box-shadow: 0 10px 20px var(--aura-glow); }
-        .btn-next:hover { transform: translateY(-3px); filter: brightness(1.1); }
-        .btn-cancel { background: transparent; color: #ff4b2b; border: 1px solid rgba(255, 75, 43, 0.2); }
+        .btn-primary {
+            background: var(--gradient);
+            color: white;
+            box-shadow: 0 8px 24px var(--accent-glow);
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 14px 36px var(--accent-glow); }
+        .btn-primary:active { transform: translateY(0); }
 
-        .loader {
-            border: 3px solid rgba(255,255,255,0.1);
-            border-top: 3px solid var(--aura-primary);
-            border-radius: 50%; width: 45px; height: 45px;
-            animation: spin 1s linear infinite;
-            margin: 25px auto;
+        .btn-ghost {
+            background: transparent;
+            color: var(--muted);
+            border: 1px solid var(--border);
         }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .btn-ghost:hover { color: var(--text); border-color: rgba(255,255,255,0.15); background: rgba(255,255,255,0.04); }
+
+        .btn-danger {
+            background: transparent;
+            color: #ff6b6b;
+            border: 1px solid rgba(255,107,107,0.2);
+        }
+        .btn-danger:hover { background: rgba(255,107,107,0.08); border-color: rgba(255,107,107,0.35); }
+
+        /* ─── Loader ─── */
+        .loader-wrapper { text-align: center; padding: 20px 0; }
+        .loader {
+            width: 48px; height: 48px;
+            border-radius: 50%;
+            border: 3px solid rgba(255,255,255,0.07);
+            border-top-color: var(--accent);
+            animation: spin 0.9s linear infinite;
+            margin: 24px auto;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loader-text { color: var(--muted); font-size: 0.85rem; font-weight: 300; }
+
+        /* ─── Success ─── */
+        .success-wrapper { text-align: center; padding: 10px 0; display: none; }
+        .success-icon {
+            width: 72px; height: 72px;
+            border-radius: 50%;
+            background: rgba(48, 209, 88, 0.1);
+            border: 1px solid rgba(48, 209, 88, 0.25);
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 1.8rem;
+            color: var(--success);
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+        }
+        @keyframes popIn {
+            from { transform: scale(0.5); opacity: 0; }
+            to   { transform: scale(1); opacity: 1; }
+        }
+        .success-wrapper h2 { margin-bottom: 10px; }
+        .success-wrapper .step-desc { margin-bottom: 28px; }
+
+        /* ─── Back link ─── */
+        .back-link {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--muted);
+            font-size: 0.78rem;
+            text-decoration: none;
+            margin-bottom: 28px;
+            transition: color 0.2s;
+            width: fit-content;
+        }
+        .back-link:hover { color: var(--text); }
     </style>
 </head>
 <body>
 
-<div class="glow"></div>
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+    <div class="bg-grid"></div>
 
-<div class="order-container">
-    
-    <div class="step active" id="step1">
-        <h2>Nuovo Progetto</h2>
-        <p>Scegli il piano ideale per le tue esigenze.</p>
-        <select id="plan">
-            <option value="" disabled selected>Seleziona un piano...</option>
-            <optgroup label="🔥 Professionale">
-                <option value="Normal Base (50€)">Normal Base - 50€</option>
-                <option value="Normal Standard (70€)">Normal Standard - 70€</option>
-                <option value="Normal Premium (100€)">Normal Premium - 100€</option>
-            </optgroup>
-            <optgroup label="💸 Budget">
-                <option value="Budget Base (20€)">Budget Base - 20€</option>
-                <option value="Budget Standard (35€)">Budget Standard - 35€</option>
-                <option value="Budget Premium (50€)">Budget Premium - 50€</option>
-            </optgroup>
-        </select>
-        <button class="btn btn-next" onclick="goToStep(2)">Continua</button>
-    </div>
+    <div class="order-container">
 
-    <div class="step" id="step2">
-        <h2>Riepilogo Dati</h2>
-        <p>Confermando, i seguenti dati verranno trasmessi al team Aura:</p>
-        <div class="data-box">
-            <div class="data-item">Nome: <span id="display-name">...</span></div>
-            <div class="data-item">Cognome: <span id="display-surname">...</span></div>
-            <div class="data-item">Email: <span id="display-email" style="font-size: 0.75rem;">...</span></div>
-            <div class="data-item">Aura UID: <code id="display-uid">...</code></div>
+        <a href="index.html" class="back-link">
+            <i class="fa-solid fa-arrow-left"></i> Torna ai piani
+        </a>
+
+        <!-- Progress -->
+        <div class="progress-bar" id="progress-bar">
+            <div class="progress-dot active" id="dot-1"></div>
+            <div class="progress-line" id="line-1"></div>
+            <div class="progress-dot" id="dot-2"></div>
+            <div class="progress-line" id="line-2"></div>
+            <div class="progress-dot" id="dot-3"></div>
         </div>
-        <button class="btn btn-next" onclick="submitRequest()">Conferma Ordine</button>
-        <button class="btn btn-cancel" onclick="window.location.href='index.html'">Annulla</button>
-    </div>
 
-    <div class="step" id="step3">
-        <div id="loading">
-            <h2>Elaborazione...</h2>
-            <div class="loader"></div>
-        </div>
-        <div id="success" style="display:none;">
-            <i class="fas fa-rocket" style="font-size: 3rem; color: var(--aura-primary); margin-bottom: 20px;"></i>
-            <h2>Richiesta Ricevuta!</h2>
-            <p>Il team Aura ha preso in carico il tuo ordine. Ti contatteremo presto via email!</p>
-            <button class="btn btn-next" onclick="window.location.href='/index.html'">Vai al sito web</button>
-        </div>
-    </div>
+        <!-- Step 1: Piano -->
+        <div class="step active" id="step1">
+            <div class="step-icon"><i class="fa-solid fa-bolt"></i></div>
+            <h2>Scegli il Piano</h2>
+            <p class="step-desc">Seleziona la soluzione più adatta alle tue esigenze.</p>
 
-</div>
+            <div class="select-wrapper">
+                <select id="plan" onchange="updatePlanPreview()">
+                    <option value="" disabled selected>Seleziona un piano...</option>
+                    <optgroup label="🔥 Professionale">
+                        <option value="Normal Base (50€)">Normal Base — 50€</option>
+                        <option value="Normal Standard (70€)">Normal Standard — 70€</option>
+                        <option value="Normal Premium (100€)">Normal Premium — 100€</option>
+                    </optgroup>
+                    <optgroup label="💸 Budget">
+                        <option value="Budget Base (20€)">Budget Base — 20€</option>
+                        <option value="Budget Standard (35€)">Budget Standard — 35€</option>
+                        <option value="Budget Premium (50€)">Budget Premium — 50€</option>
+                    </optgroup>
+                </select>
+            </div>
+
+            <div class="plan-preview" id="plan-preview">
+                <div class="plan-preview-icon"><i class="fa-solid fa-check" style="color:white;"></i></div>
+                <div class="plan-preview-text">
+                    <div class="plan-preview-name" id="preview-name">—</div>
+                    <div class="plan-preview-price" id="preview-price">—</div>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" onclick="goToStep(2)">
+                Continua <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </div>
+
+        <!-- Step 2: Riepilogo -->
+        <div class="step" id="step2">
+            <div class="step-icon"><i class="fa-solid fa-user-check"></i></div>
+            <h2>Riepilogo Ordine</h2>
+            <p class="step-desc">Verifica i tuoi dati prima di confermare. Saranno inviati al team Aura.</p>
+
+            <div class="data-box">
+                <div class="data-box-title">Dati cliente</div>
+                <div class="data-item">
+                    <span class="data-item-label">Nome</span>
+                    <span class="data-item-value" id="display-name">—</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-item-label">Cognome</span>
+                    <span class="data-item-value" id="display-surname">—</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-item-label">Email</span>
+                    <span class="data-item-value" id="display-email">—</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-item-label">Aura UID</span>
+                    <span class="data-item-value uid" id="display-uid">—</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-item-label">Piano selezionato</span>
+                    <span class="data-item-value plan-value" id="display-plan">—</span>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" onclick="submitRequest()">
+                <i class="fa-solid fa-paper-plane"></i> Conferma Ordine
+            </button>
+            <button class="btn btn-ghost" onclick="goToStep(1)">
+                <i class="fa-solid fa-arrow-left"></i> Modifica piano
+            </button>
+            <button class="btn btn-danger" onclick="window.location.href='index.html'">
+                Annulla
+            </button>
+        </div>
+
+        <!-- Step 3: Elaborazione / Successo -->
+        <div class="step" id="step3">
+            <div class="loader-wrapper" id="loading">
+                <div class="step-icon" style="margin: 0 auto 20px;"><i class="fa-solid fa-rocket"></i></div>
+                <h2>Elaborazione...</h2>
+                <div class="loader"></div>
+                <p class="loader-text">Stiamo inviando il tuo ordine al team Aura.</p>
+            </div>
+
+            <div class="success-wrapper" id="success">
+                <div class="success-icon"><i class="fa-solid fa-check"></i></div>
+                <h2>Richiesta Ricevuta!</h2>
+                <p class="step-desc">Il team Aura ha preso in carico il tuo ordine.<br>Ti contatteremo presto via email!</p>
+                <button class="btn btn-primary" onclick="window.location.href='/index.html'">
+                    <i class="fa-solid fa-house"></i> Vai al sito
+                </button>
+            </div>
+        </div>
+
+    </div>
 
 <script>
     const firebaseConfig = {
@@ -184,7 +472,7 @@
         messagingSenderId: "190478237725",
         appId: "1:190478237725:web:0d39907473f511b85a06f4"
     };
-    
+
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.firestore();
@@ -192,45 +480,62 @@
     let orderData = {};
 
     auth.onAuthStateChanged(user => {
-        if (!user) {
-            window.location.href = '/index.html'; 
-            return;
-        }
+        if (!user) { window.location.href = '/index.html'; return; }
 
         db.collection('users').doc(user.uid).get().then(doc => {
             if (doc.exists) {
                 const data = doc.data();
-                orderData = {
-                    uid: user.uid,
-                    nome: data.nome,
-                    cognome: data.cognome,
-                    email: user.email // Presa da Auth (più sicura)
-                };
-                
-                document.getElementById('display-name').textContent = data.nome;
+                orderData = { uid: user.uid, nome: data.nome, cognome: data.cognome, email: user.email };
+                document.getElementById('display-name').textContent    = data.nome;
                 document.getElementById('display-surname').textContent = data.cognome;
-                document.getElementById('display-email').textContent = user.email;
-                document.getElementById('display-uid').textContent = user.uid.substring(0, 15) + "...";
+                document.getElementById('display-email').textContent   = user.email;
+                document.getElementById('display-uid').textContent     = user.uid.substring(0, 16) + '...';
             }
         });
     });
 
+    // Plan preview
+    function updatePlanPreview() {
+        const val = document.getElementById('plan').value;
+        if (!val) return;
+        const match = val.match(/^(.+)\s\((.+)\)$/);
+        if (match) {
+            document.getElementById('preview-name').textContent  = match[1];
+            document.getElementById('preview-price').textContent = match[2];
+            document.getElementById('display-plan').textContent  = val;
+        }
+        document.getElementById('plan-preview').classList.add('visible');
+    }
+
+    // Progress
+    function updateProgress(step) {
+        for (let i = 1; i <= 3; i++) {
+            const dot  = document.getElementById('dot-' + i);
+            const line = document.getElementById('line-' + i);
+            dot.classList.remove('active', 'done');
+            if (line) line.classList.remove('filled');
+            if (i < step)  { dot.classList.add('done'); if (line) line.classList.add('filled'); }
+            if (i === step) dot.classList.add('active');
+        }
+    }
+
     function goToStep(num) {
         if (num === 2 && !document.getElementById('plan').value) {
-            alert("Scegli un piano prima di continuare.");
+            document.getElementById('plan').style.borderColor = 'rgba(255,107,107,0.5)';
+            setTimeout(() => document.getElementById('plan').style.borderColor = '', 1500);
             return;
         }
         document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
         document.getElementById('step' + num).classList.add('active');
+        updateProgress(num);
     }
 
     async function submitRequest() {
         goToStep(3);
-        
         const payload = {
             progetto: "Sviluppo Web Aura",
             piano_scelto: document.getElementById('plan').value,
-            cliente: orderData.nome + " " + orderData.cognome,
+            cliente: orderData.nome + ' ' + orderData.cognome,
             email_cliente: orderData.email,
             uid: orderData.uid,
             timestamp: new Date().toLocaleString('it-IT')
@@ -239,24 +544,17 @@
         const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbxQuA_Fp-rEk3aqrAcfUl_fYqtlvk3loYcbvBjFiVMK7qduCVFOMd3yr8Xk5fDFtfpKjg/exec";
 
         try {
-            await fetch(WEBHOOK_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify(payload)
-            });
-
+            await fetch(WEBHOOK_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
             setTimeout(() => {
                 document.getElementById('loading').style.display = 'none';
-                document.getElementById('success').style.display = 'block';
+                document.getElementById('success').style.display  = 'block';
             }, 1800);
-
-        } catch (error) {
-            console.error("Errore invio:", error);
+        } catch (err) {
+            console.error(err);
             alert("Connessione fallita. Riprova.");
             goToStep(2);
         }
     }
 </script>
-
 </body>
 </html>
