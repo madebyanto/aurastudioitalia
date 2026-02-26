@@ -541,7 +541,7 @@
             timestamp: new Date().toLocaleString('it-IT')
         };
 
-        const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbxQuA_Fp-rEk3aqrAcfUl_fYqtlvk3loYcbvBjFiVMK7qduCVFOMd3yr8Xk5fDFtfpKjg/exec";
+        const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbzo1mBKvx_F8CvuEin0KclkctTfHCixscKnlofdGA1UiJXAYoCKnRy7FuFj3BcBVV5OaQ/exec";
 
         try {
             await fetch(WEBHOOK_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
