@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Accedi ad Aura</title>
-    <link rel="icon" href="images/aura-nobg.png" type="image/png">
+    <link rel="icon" href="/images/aura-nobg.png" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -220,7 +220,7 @@
 </div>
 
 <div class="auth-card">
-    <img src="images/aura-nobg.png" alt="Aura Logo" class="logo">
+    <img src="/images/aura-nobg.png" alt="Aura Logo" class="logo">
     
     <div class="tab-group">
         <button id="tab-login" class="tab-btn active">Accedi</button>
@@ -299,7 +299,7 @@
                     showMsg('msg-login', 'Verifica la tua email prima di entrare.', true);
                     await auth.signOut();
                 } else {
-                    window.location.href = "dashboard.html";
+                    window.location.href = "buy.html";
                 }
             })
             .catch(err => showMsg('msg-login', getAuthErrorMessage(normalizeAuthError(err)), true));
