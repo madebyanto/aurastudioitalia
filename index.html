@@ -1,0 +1,1578 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aura</title>
+    <link rel="icon" type="image/png" href="images/aura.jpg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-color: #f8f9fa;
+            --card-bg: rgba(255, 255, 255, 0.7);
+            --text-main: #2d3436;
+            --text-muted: #636e72;
+            --accent: #F05BFF;
+            --accent-soft: rgba(240, 91, 255, 0.1);
+            --nav-bg: rgba(255, 255, 255, 0.8);
+            --border-color: rgba(0,0,0,0.06);
+            --shadow: 0 10px 30px rgba(0,0,0,0.06);
+            --grid-color: rgba(240, 91, 255, 0.07);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #0f0f12;
+                --card-bg: rgba(30, 30, 35, 0.7);
+                --text-main: #f5f5f7;
+                --text-muted: #a1a1a6;
+                --nav-bg: rgba(15, 15, 18, 0.85);
+                --border-color: rgba(255,255,255,0.06);
+                --shadow: 0 10px 40px rgba(0,0,0,0.3);
+                --grid-color: rgba(240, 91, 255, 0.1);
+            }
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .glass-grid {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100vh;
+            background-image: 
+                linear-gradient(var(--grid-color) 1px, transparent 1px),
+                linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+            background-size: 40px 40px;
+            mask-image: linear-gradient(to bottom, black 0%, transparent 80%);
+            -webkit-mask-image: linear-gradient(to bottom, black 0%, transparent 80%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: -15%; left: -10%;
+            width: 45%; height: 45%;
+            background: radial-gradient(circle, var(--accent-soft) 0%, transparent 70%);
+            z-index: -2;
+            animation: blobDrift 20s ease-in-out infinite alternate;
+        }
+        body::after {
+            content: "";
+            position: fixed;
+            bottom: -10%; right: -5%;
+            width: 35%; height: 35%;
+            background: radial-gradient(circle, var(--accent-soft) 0%, transparent 70%);
+            z-index: -2;
+            animation: blobDrift 25s ease-in-out infinite alternate-reverse;
+        }
+        @keyframes blobDrift {
+            from { transform: translate(0, 0) scale(1); }
+            to   { transform: translate(30px, 20px) scale(1.1); }
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 25px;
+        }
+
+        /* ─── DONATION TOAST ─── */
+        .donation-toast {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            z-index: 9999;
+            background: var(--nav-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(240,91,255,0.25);
+            border-radius: 20px;
+            padding: 20px 22px;
+            max-width: 320px;
+            box-shadow: 0 20px 60px rgba(240,91,255,0.15), 0 4px 20px rgba(0,0,0,0.1);
+            transform: translateX(380px);
+            opacity: 0;
+            transition: transform 0.5s cubic-bezier(0.16,1,0.3,1), opacity 0.5s ease;
+        }
+        .donation-toast.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        .donation-toast-close {
+            position: absolute;
+            top: 10px; right: 12px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-size: 16px;
+            line-height: 1;
+            padding: 4px;
+            border-radius: 6px;
+            transition: 0.2s;
+        }
+        .donation-toast-close:hover { color: var(--accent); background: var(--accent-soft); }
+        .donation-toast-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            padding-right: 20px;
+        }
+        .donation-toast-emoji { font-size: 1.5rem; }
+        .donation-toast-title { font-weight: 700; font-size: 0.95rem; }
+        .donation-toast p { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 14px; line-height: 1.5; }
+        .donation-toast-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 11px;
+            background: linear-gradient(135deg, #F05BFF, #b44fff);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.2s;
+            box-shadow: 0 6px 20px rgba(240,91,255,0.35);
+            text-decoration: none;
+        }
+        .donation-toast-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(240,91,255,0.45); }
+
+        /* ─── DONATION MODAL ─── */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(8px);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            padding: 20px;
+        }
+        .modal-backdrop.show { opacity: 1; pointer-events: all; }
+        .donation-modal {
+            background: var(--bg-color);
+            border: 1px solid rgba(240,91,255,0.2);
+            border-radius: 28px;
+            padding: 40px;
+            max-width: 460px;
+            width: 100%;
+            text-align: center;
+            transform: scale(0.9) translateY(20px);
+            transition: transform 0.4s cubic-bezier(0.16,1,0.3,1);
+            position: relative;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.2);
+        }
+        .modal-backdrop.show .donation-modal { transform: scale(1) translateY(0); }
+        .modal-close {
+            position: absolute;
+            top: 16px; right: 16px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            width: 36px; height: 36px;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-muted);
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .modal-close:hover { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+        .modal-heart {
+            font-size: 3rem;
+            display: block;
+            margin-bottom: 16px;
+            animation: heartbeat 1.5s ease-in-out infinite;
+        }
+        @keyframes heartbeat {
+            0%,100% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+        }
+        .donation-modal h3 { font-size: 1.5rem; font-weight: 800; margin-bottom: 12px; }
+        .donation-modal p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 28px; line-height: 1.65; }
+        .donation-tiers {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .tier-btn {
+            padding: 14px 10px;
+            border-radius: 14px;
+            border: 2px solid var(--border-color);
+            background: var(--card-bg);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Poppins', sans-serif;
+        }
+        .tier-btn .tier-amount { font-size: 1.1rem; font-weight: 800; color: var(--text-main); }
+        .tier-btn .tier-label { font-size: 0.65rem; color: var(--text-muted); margin-top: 2px; }
+        .tier-btn:hover, .tier-btn.selected {
+            border-color: var(--accent);
+            background: var(--accent-soft);
+        }
+        .tier-btn.selected .tier-amount { color: var(--accent); }
+        .modal-donate-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #F05BFF, #b44fff);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            text-decoration: none;
+            transition: all 0.25s;
+            box-shadow: 0 8px 24px rgba(240,91,255,0.35);
+        }
+        .modal-donate-btn:hover { transform: translateY(-3px); box-shadow: 0 14px 36px rgba(240,91,255,0.45); }
+        .modal-footer-note {
+            margin-top: 14px;
+            font-size: 0.72rem;
+            color: var(--text-muted);
+        }
+
+        /* ─── Header ─── */
+        .main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 22px;
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 1100px;
+            z-index: 1000;
+            background: var(--nav-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 50px;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow), inset 0 1px 0 rgba(255,255,255,0.1);
+            transition: top 0.3s ease, padding 0.3s ease;
+        }
+        .main-header.scrolled { top: 10px; }
+
+        .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+        .logo img { max-height: 38px; border-radius: 50%; }
+        .logo-name { font-weight: 800; font-size: 1rem; color: var(--text-main); }
+
+        .header-right { display: flex; align-items: center; gap: 10px; }
+
+        .header-donate-btn {
+            padding: 8px 18px;
+            border-radius: 30px;
+            background: linear-gradient(135deg, #F05BFF, #b44fff);
+            color: white;
+            font-weight: 600;
+            font-size: 0.8rem;
+            border: none;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s;
+            box-shadow: 0 4px 14px rgba(240,91,255,0.3);
+        }
+        .header-donate-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(240,91,255,0.4); }
+
+        .menu-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 6px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            outline: none;
+        }
+        .menu-btn span {
+            width: 24px; height: 2px;
+            background: var(--text-main);
+            border-radius: 2px;
+            transition: 0.3s;
+            transform-origin: center;
+        }
+        .menu-btn.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        .menu-btn.active span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+        .menu-btn.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+        /* ─── Sidebar ─── */
+        .sidebar-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.35);
+            backdrop-filter: blur(4px);
+            z-index: 1500;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s;
+        }
+        .sidebar-overlay.visible { opacity: 1; pointer-events: all; }
+
+        .sidebar {
+            position: fixed;
+            top: 0; right: -100%;
+            width: 300px; height: 100%;
+            background: var(--nav-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            z-index: 2000;
+            padding: 40px 32px;
+            transition: right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            border-left: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+        .sidebar.open { right: 0; }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+        .sidebar-brand { font-weight: 800; font-size: 1.1rem; color: var(--accent); }
+
+        .close-menu-btn {
+            background: none;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            width: 36px; height: 36px;
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-muted);
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .close-menu-btn:hover { color: var(--text-main); background: var(--accent-soft); border-color: var(--accent); }
+
+        .sidebar ul { list-style: none; flex: 1; }
+        .sidebar ul li {
+            border-bottom: 1px solid var(--border-color);
+            opacity: 0;
+            transform: translateX(16px);
+            transition: opacity 0.3s, transform 0.3s;
+        }
+        .sidebar.open ul li { opacity: 1; transform: translateX(0); }
+        .sidebar.open ul li:nth-child(1) { transition-delay: 0.05s; }
+        .sidebar.open ul li:nth-child(2) { transition-delay: 0.10s; }
+        .sidebar.open ul li:nth-child(3) { transition-delay: 0.15s; }
+        .sidebar.open ul li:nth-child(4) { transition-delay: 0.20s; }
+        .sidebar.open ul li:nth-child(5) { transition-delay: 0.25s; }
+        .sidebar.open ul li:nth-child(6) { transition-delay: 0.30s; }
+        .sidebar.open ul li:nth-child(7) { transition-delay: 0.35s; }
+
+        .sidebar ul li a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 0;
+            transition: all 0.25s;
+        }
+        .sidebar ul li a:hover { color: var(--accent); padding-left: 6px; }
+        .sidebar ul li a .nav-icon {
+            width: 30px; height: 30px;
+            background: var(--accent-soft);
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 13px;
+            color: var(--accent);
+            flex-shrink: 0;
+            transition: 0.2s;
+        }
+        .sidebar ul li a:hover .nav-icon { background: var(--accent); color: white; }
+
+        .sidebar-footer {
+            padding-top: 24px;
+            border-top: 1px solid var(--border-color);
+        }
+        .sidebar-footer a {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .sidebar-footer a:hover { color: var(--accent); }
+
+        /* ─── Hero ─── */
+        .hero {
+            padding: 185px 0 100px;
+            text-align: center;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 16px 6px 10px;
+            border-radius: 50px;
+            border: 1px solid rgba(240, 91, 255, 0.25);
+            background: var(--accent-soft);
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 28px;
+            animation: fadeUp 0.7s ease both;
+        }
+        .hero-badge-dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--accent);
+            animation: pulse 2s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.7); }
+        }
+
+        /* Open Source Badge */
+        .opensource-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 5px 14px 5px 10px;
+            border-radius: 50px;
+            border: 1px solid rgba(88, 166, 255, 0.3);
+            background: rgba(88, 166, 255, 0.08);
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #58a6ff;
+            margin-bottom: 14px;
+            text-decoration: none;
+            transition: all 0.2s;
+            animation: fadeUp 0.7s 0.05s ease both;
+        }
+        .opensource-badge:hover {
+            background: rgba(88, 166, 255, 0.15);
+            border-color: rgba(88, 166, 255, 0.5);
+            transform: translateY(-2px);
+        }
+        .opensource-badge i { font-size: 0.85rem; }
+
+        .hero-badges-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 0;
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            font-weight: 800;
+            line-height: 1.08;
+            margin-bottom: 24px;
+            animation: fadeUp 0.7s 0.1s ease both;
+        }
+
+        .highlight {
+            background: linear-gradient(135deg, #F05BFF, #b44fff, #F05BFF);
+            background-size: 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 5s ease-in-out infinite;
+        }
+        @keyframes shimmer {
+            0%, 100% { background-position: 0%; }
+            50% { background-position: 100%; }
+        }
+
+        .hero p {
+            max-width: 580px;
+            margin: 0 auto 42px;
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            font-weight: 300;
+            animation: fadeUp 0.7s 0.2s ease both;
+        }
+
+        .hero-buttons { animation: fadeUp 0.7s 0.3s ease both; }
+
+        .hero-trust {
+            margin-top: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 24px;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            flex-wrap: wrap;
+            animation: fadeUp 0.7s 0.45s ease both;
+        }
+        .hero-trust-item { display: flex; align-items: center; gap: 6px; }
+        .hero-trust-item i { color: var(--accent); font-size: 0.8rem; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ─── Buttons ─── */
+        .btn {
+            padding: 13px 28px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.25s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin: 8px;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 8px 24px rgba(240, 91, 255, 0.3);
+        }
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 14px 36px rgba(240, 91, 255, 0.4);
+        }
+        .btn-secondary {
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+        }
+        .btn-secondary:hover {
+            background: var(--accent-soft);
+            border-color: rgba(240, 91, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        .btn-github {
+            border: 1px solid rgba(88,166,255,0.3);
+            color: #58a6ff;
+            background: rgba(88,166,255,0.07);
+            backdrop-filter: blur(10px);
+        }
+        .btn-github:hover {
+            background: rgba(88,166,255,0.14);
+            border-color: rgba(88,166,255,0.5);
+            transform: translateY(-2px);
+        }
+
+        /* ─── Sections ─── */
+        section { padding: 80px 0; }
+        h2 { font-size: clamp(1.7rem, 4vw, 2.3rem); font-weight: 800; margin-bottom: 40px; text-align: center; }
+
+        /* ─── Open Source Section ─── */
+        .opensource-section {
+            background: var(--card-bg);
+            border: 1px solid rgba(88,166,255,0.2);
+            border-radius: 36px;
+            padding: 52px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+        .opensource-section::before {
+            content: '';
+            position: absolute;
+            top: -60px; left: -60px;
+            width: 240px; height: 240px;
+            background: radial-gradient(circle, rgba(88,166,255,0.1), transparent 70%);
+            pointer-events: none;
+        }
+        .os-text h2 { text-align: left; margin-bottom: 16px; }
+        .os-text p { color: var(--text-muted); font-weight: 300; margin-bottom: 24px; line-height: 1.7; }
+        .os-stats { display: flex; gap: 28px; margin-bottom: 28px; flex-wrap: wrap; }
+        .os-stat { text-align: center; }
+        .os-stat-val { font-size: 1.5rem; font-weight: 800; color: #58a6ff; }
+        .os-stat-lbl { font-size: 0.7rem; color: var(--text-muted); }
+        .os-code {
+            background: rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            line-height: 1.8;
+            position: relative;
+            z-index: 1;
+        }
+        @media (prefers-color-scheme: dark) {
+            .os-code { background: rgba(88,166,255,0.04); }
+        }
+        .os-code .cmd-comment { color: #6a737d; }
+        .os-code .cmd-text { color: #58a6ff; }
+        .os-code .cmd-accent { color: var(--accent); }
+
+        /* ─── Two Columns ─── */
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            align-items: center;
+            gap: 56px;
+            background: var(--card-bg);
+            padding: 52px;
+            border-radius: 36px;
+            border: 1px solid var(--border-color);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+        .two-columns::after {
+            content: '';
+            position: absolute;
+            top: -80px; right: -80px;
+            width: 280px; height: 280px;
+            background: radial-gradient(circle, var(--accent-soft), transparent 70%);
+            pointer-events: none;
+        }
+
+        .info-image img {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 16px;
+            box-shadow: 0 24px 60px rgba(0,0,0,0.12);
+        }
+
+        .info-text { text-align: left; position: relative; z-index: 1; }
+        .info-text h2 { text-align: left; margin-bottom: 16px; }
+        .info-text p { color: var(--text-muted); font-weight: 300; margin-bottom: 28px; }
+
+        .stats-row { display: flex; gap: 32px; margin-bottom: 24px; }
+        .stat-value { font-size: 1.8rem; font-weight: 800; color: var(--accent); line-height: 1; }
+        .stat-label { font-size: 0.72rem; color: var(--text-muted); margin-top: 4px; font-weight: 400; }
+
+        /* ─── Cards ─── */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 36px 28px;
+            border-radius: 28px;
+            border: 1px solid var(--border-color);
+            text-align: left;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 28px;
+            background: linear-gradient(135deg, var(--accent-soft), transparent 60%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 24px 60px rgba(0,0,0,0.1), 0 0 0 1px rgba(240,91,255,0.15);
+            border-color: rgba(240, 91, 255, 0.2);
+        }
+        .card:hover::before { opacity: 1; }
+
+        .card-icon-container { margin-bottom: 20px; position: relative; z-index: 1; }
+        .card-icon-container img {
+            width: 56px; height: 56px;
+            border-radius: 14px;
+            border: 1px solid var(--border-color);
+        }
+        .card h3 { font-size: 1.15rem; font-weight: 700; margin-bottom: 10px; position: relative; z-index: 1; }
+        .card p {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            font-weight: 300;
+            flex: 1;
+            margin-bottom: 22px;
+            position: relative;
+            z-index: 1;
+            line-height: 1.7;
+        }
+        .card .btn { margin: 0; position: relative; z-index: 1; align-self: flex-start; }
+
+        /* ─── COLLABORATORS TICKER ─── */
+        .collaborators-section { padding: 70px 0; }
+        .collaborators-section .section-label {
+            text-align: center;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 28px;
+        }
+
+        .ticker-wrapper {
+            position: relative;
+            overflow: hidden;
+            padding: 4px 0;
+        }
+        .ticker-wrapper::before,
+        .ticker-wrapper::after {
+            content: '';
+            position: absolute;
+            top: 0; bottom: 0;
+            width: 100px;
+            z-index: 2;
+            pointer-events: none;
+        }
+        .ticker-wrapper::before {
+            left: 0;
+            background: linear-gradient(to right, var(--bg-color), transparent);
+        }
+        .ticker-wrapper::after {
+            right: 0;
+            background: linear-gradient(to left, var(--bg-color), transparent);
+        }
+
+        .ticker-track {
+            display: flex;
+            gap: 16px;
+            animation: tickerScroll 28s linear infinite;
+            width: max-content;
+        }
+        .ticker-track:hover { animation-play-state: paused; }
+
+        @keyframes tickerScroll {
+            from { transform: translateX(0); }
+            to   { transform: translateX(-50%); }
+        }
+
+        .collaborator-chip {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 20px 10px 12px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 50px;
+            white-space: nowrap;
+            backdrop-filter: blur(10px);
+            transition: all 0.25s;
+            flex-shrink: 0;
+        }
+        .collaborator-chip:hover {
+            border-color: rgba(240,91,255,0.3);
+            background: var(--accent-soft);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(240,91,255,0.12);
+        }
+        .collaborator-avatar {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            border: 2px solid var(--border-color);
+            background: var(--accent-soft);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.75rem;
+            color: var(--accent);
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        .collaborator-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .collaborator-info {}
+        .collaborator-name { font-weight: 700; font-size: 0.85rem; line-height: 1.2; }
+        .collaborator-role { font-size: 0.7rem; color: var(--text-muted); }
+
+        /* ─── PARTNERS TICKER ─── */
+        .partners-section { 
+            padding: 120px 0; 
+            position: relative;
+            overflow: hidden;
+        }
+        .partners-header { text-align: center; margin-bottom: 50px; }
+        .partners-header h2 { margin-bottom: 16px; }
+        .partners-header p { color: var(--text-muted); font-size: 1rem; max-width: 600px; margin: 0 auto; font-weight: 300; }
+
+        .partner-chip {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 30px;
+            background: transparent;
+            border-radius: 24px;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            flex-shrink: 0;
+            text-decoration: none;
+            position: relative;
+            width: 220px; 
+            height: 90px; 
+        }
+
+        .partner-chip:hover {
+            background: var(--accent-soft);
+            transform: translateY(-5px);
+        }
+
+        .partner-logo {
+            max-height: 45px;
+            max-width: 140px;
+            object-fit: contain;
+            filter: none;
+            opacity: 0.6;
+            transition: all 0.4s ease;
+            position: relative;
+            z-index: 1;
+            border-radius: 12px;
+        }
+        .partner-chip:hover .partner-logo {
+            opacity: 1;
+            transform: scale(1.08);
+        }
+        
+        .partners-ticker-track {
+            animation: tickerScroll 60s linear infinite; 
+            display: flex;
+            will-change: transform;
+        }
+
+        /* ─── Donate Section ─── */
+        .donate-section-wrap {
+            background: linear-gradient(135deg, var(--accent-soft) 0%, rgba(88,166,255,0.05) 100%);
+            border: 1px solid rgba(240,91,255,0.15);
+            border-radius: 36px;
+            padding: 56px 52px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .donate-section-wrap::before {
+            content: '';
+            position: absolute;
+            top: -80px; left: 50%;
+            transform: translateX(-50%);
+            width: 400px; height: 200px;
+            background: radial-gradient(ellipse, rgba(240,91,255,0.12), transparent 70%);
+            pointer-events: none;
+        }
+        .donate-section-wrap h2 { margin-bottom: 14px; position: relative; }
+        .donate-section-wrap > p { color: var(--text-muted); max-width: 520px; margin: 0 auto 32px; font-weight: 300; position: relative; }
+        .donate-perks {
+            display: flex;
+            justify-content: center;
+            gap: 28px;
+            flex-wrap: wrap;
+            margin-bottom: 36px;
+            position: relative;
+        }
+        .donate-perk {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+        .donate-perk i { color: var(--accent); }
+        .donate-cta-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; position: relative; }
+
+        /* ─── Stay In ─── */
+        .stay-in-buttons { display: flex; gap: 12px; margin-top: 28px; }
+        .stay-btn {
+            flex: 1;
+            padding: 13px 16px;
+            border-radius: 14px;
+            text-decoration: none;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: all 0.25s;
+        }
+        .stay-btn:hover { transform: translateY(-3px); filter: brightness(1.1); }
+        .whatsapp { background: linear-gradient(135deg, #25D366, #128C7E); box-shadow: 0 8px 20px rgba(37,211,102,0.2); }
+        .discord  { background: linear-gradient(135deg, #5865F2, #4752C4); box-shadow: 0 8px 20px rgba(88,101,242,0.2); }
+
+        /* ─── Reveal ─── */
+        .reveal {
+            opacity: 0;
+            transform: translateY(28px);
+            transition: opacity 0.65s ease, transform 0.65s ease;
+        }
+        .reveal.visible { opacity: 1; transform: translateY(0); }
+
+        /* ─── Footer ─── */
+        footer {
+            padding: 72px 0 36px;
+            border-top: 1px solid var(--border-color);
+            margin-top: 50px;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr 1fr 1fr;
+            gap: 40px;
+            text-align: left;
+            margin-bottom: 48px;
+        }
+
+        .footer-brand .footer-logo-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+        .footer-brand .footer-logo-wrap img { max-height: 38px; border-radius: 50%; }
+        .footer-brand .footer-logo-wrap span { font-weight: 800; font-size: 1rem; }
+
+        .footer-brand p {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            max-width: 280px;
+            margin-bottom: 22px;
+            font-weight: 300;
+            line-height: 1.65;
+        }
+
+        .footer-socials { display: flex; gap: 10px; flex-wrap: wrap; }
+        .social-icon {
+            width: 40px; height: 40px;
+            background: var(--card-bg);
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            display: flex; justify-content: center; align-items: center;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 15px;
+            transition: all 0.25s;
+        }
+        .social-icon:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        .footer-col h4 {
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 18px;
+        }
+        .footer-col ul { list-style: none; }
+        .footer-col ul li { margin-bottom: 10px; }
+        .footer-col ul li a {
+            text-decoration: none;
+            color: var(--text-main);
+            font-size: 0.875rem;
+            font-weight: 400;
+            opacity: 0.75;
+            transition: all 0.2s;
+        }
+        .footer-col ul li a:hover { opacity: 1; color: var(--accent); padding-left: 4px; }
+
+        .footer-bottom {
+            padding-top: 28px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        .footer-credit { font-size: 0.8rem; color: var(--text-muted); }
+
+        /* ─── Mobile ─── */
+        @media (max-width: 768px) {
+            .two-columns { grid-template-columns: 1fr; text-align: center; padding: 32px; gap: 32px; }
+            .info-text { text-align: center; }
+            .info-text h2 { text-align: center; }
+            .stats-row { justify-content: center; }
+            .hero { padding-top: 145px; }
+            .main-header { top: 10px; width: 94%; }
+            .stay-in-buttons { flex-direction: column; }
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+            .footer-brand { grid-column: span 2; margin-bottom: 10px; }
+            .footer-bottom { flex-direction: column; text-align: center; }
+            .opensource-section { grid-template-columns: 1fr; text-align: center; padding: 32px; gap: 32px; }
+            .os-text h2 { text-align: center; }
+            .os-stats { justify-content: center; }
+            .donation-toast { right: 16px; bottom: 16px; max-width: calc(100vw - 32px); }
+            .header-donate-btn span { display: none; }
+            .donate-section-wrap { padding: 36px 24px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="glass-grid"></div>
+
+    <!-- DONATION TOAST -->
+    <div class="donation-toast" id="donation-toast">
+        <button class="donation-toast-close" id="toast-close" aria-label="Chiudi">×</button>
+        <div class="donation-toast-header">
+            <span class="donation-toast-emoji">✨</span>
+            <span class="donation-toast-title">Aura è gratuito per tutti</span>
+        </div>
+        <p>Costruiamo questo ecosistema nel tempo libero, con passione. Una donazione, anche piccola, ci aiuta ad andare avanti.</p>
+        <button class="donation-toast-btn" id="toast-donate-btn">
+            <i class="fa-solid fa-heart"></i> Supporta il progetto
+        </button>
+    </div>
+
+    <!-- DONATION MODAL -->
+    <div class="modal-backdrop" id="donation-modal">
+        <div class="donation-modal">
+            <button class="modal-close" id="modal-close">×</button>
+            <span class="modal-heart">💜</span>
+            <h3>Supporta <span class="highlight">Aura</span></h3>
+            <p>Ogni donazione va direttamente allo sviluppo di nuovi strumenti, ai server e alla crescita della community. Grazie per crederci.</p>
+            <div class="donation-tiers">
+                <div class="tier-btn" data-amount="2">
+                    <div class="tier-amount">€2</div>
+                    <div class="tier-label">☕ Caffè</div>
+                </div>
+                <div class="tier-btn selected" data-amount="5">
+                    <div class="tier-amount">€5</div>
+                    <div class="tier-label">🍕 Pizza</div>
+                </div>
+                <div class="tier-btn" data-amount="10">
+                    <div class="tier-amount">€10</div>
+                    <div class="tier-label">🚀 Boost</div>
+                </div>
+            </div>
+            <a href="https://ko-fi.com/aurastudioitalia" target="_blank" class="modal-donate-btn" id="modal-donate-link">
+                <i class="fa-solid fa-heart"></i> Dona ora su Ko-fi
+            </a>
+            <p class="modal-footer-note">🔒 Sicuro & anonimo · Nessun abbonamento · Solo una volta</p>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="main-header" id="header">
+        <a class="logo" href="index.html">
+            <img src="images/aura.jpg" alt="Aura Logo">
+            <span class="logo-name">Aura</span>
+        </a>
+        <div class="header-right">
+            <button class="header-donate-btn" id="header-donate-btn">
+                <i class="fa-solid fa-heart"></i>
+                <span>Supportaci</span>
+            </button>
+            <button id="open-menu" class="menu-btn" aria-label="Apri menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Overlay -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+    <!-- Sidebar -->
+    <nav id="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <span class="sidebar-brand">Aura</span>
+            <button id="close-menu" class="close-menu-btn">&times;</button>
+        </div>
+        <ul>
+            <li><a href="index.html">
+                <span class="nav-icon"><i class="fa-solid fa-house"></i></span>
+                Home
+            </a></li>
+            <li><a href="https://apps.aurastudioitalia.it">
+                <span class="nav-icon"><i class="fa-solid fa-user"></i></span>
+                Account
+            </a></li>
+            <li><a href="staffapp.html">
+                <span class="nav-icon"><i class="fa-solid fa-briefcase"></i></span>
+                Lavora con noi
+            </a></li>
+            <li><a href="progetti.html">
+                <span class="nav-icon"><i class="fa-solid fa-cube"></i></span>
+                Servizi
+            </a></li>
+            <li><a href="https://support.aurastudioitalia.it">
+                <span class="nav-icon"><i class="fa-solid fa-headset"></i></span>
+                Supporto
+            </a></li>
+            <li><a href="custom-sites/index.html">
+                <span class="nav-icon"><i class="fa-solid fa-globe"></i></span>
+                Ordina il tuo sito web
+            </a></li>
+            <li><a href="https://github.com/madebyanto/aura-open-source-project" target="_blank">
+                <span class="nav-icon"><i class="fa-brands fa-github"></i></span>
+                Open Source
+            </a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <a href="https://privacy.aurastudioitalia.it">Privacy</a>
+        </div>
+    </nav>
+
+    <main class="container">
+
+        <!-- Hero -->
+        <section class="hero">
+            <div class="hero-badges-row">
+                <div class="hero-badge">
+                    <span class="hero-badge-dot"></span>
+                    Collettivo italiano di giovani sviluppatori
+                </div>
+                <a href="https://github.com/madebyanto/aura-open-source-project" target="_blank" class="opensource-badge">
+                    <i class="fa-brands fa-github"></i>
+                    Open Source
+                </a>
+            </div>
+            <h1>Senti l'energia di <br><span class="highlight">Aura</span></h1>
+            <p>Siamo un collettivo italiano di giovani sviluppatori. Creiamo soluzioni digitali per connettere persone e semplificare la quotidianità attraverso il software.</p>
+            <div class="hero-buttons">
+                <a href="#services" class="btn btn-primary"><i class="fa-solid fa-sparkles"></i> Esplora Progetti</a>
+                <a href="#why-aura" class="btn btn-secondary">Chi Siamo</a>
+                <a href="https://github.com/madebyanto/aura-open-source-project" target="_blank" class="btn btn-github"><i class="fa-brands fa-github"></i> GitHub</a>
+            </div>
+            <div class="hero-trust">
+                <div class="hero-trust-item"><i class="fa-solid fa-shield-check"></i> 100% gratuito</div>
+                <div class="hero-trust-item"><i class="fa-solid fa-code"></i> Open source</div>
+                <div class="hero-trust-item"><i class="fa-solid fa-heart"></i> Made in Italy</div>
+                <div class="hero-trust-item"><i class="fa-solid fa-users"></i> Community-driven</div>
+            </div>
+        </section>
+
+        <!-- Collaboratori -->
+        <section class="collaborators-section">
+            <p class="section-label">Le persone dietro Aura</p>
+            <div class="ticker-wrapper">
+                <div class="ticker-track" id="ticker-track">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Partners -->
+        <section class="partners-section reveal">
+            <div class="container">
+                <div class="partners-header">
+                    <p class="section-label">Il nostro Ecosistema</p>
+                    <h2>Partner di <span class="highlight">Fiducia</span></h2>
+                    <p>Collaboriamo con realtà innovative per potenziare i nostri servizi e offrire il meglio alla nostra community.</p>
+                </div>
+            </div>
+            <div class="ticker-wrapper">
+                <div class="ticker-track partners-ticker-track" id="partners-track">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Chi Siamo -->
+        <section id="why-aura">
+            <div class="two-columns reveal">
+                <div class="info-image">
+                    <img src="images/aura-grafic-1.png" alt="Visione Aura">
+                </div>
+                <div class="info-text">
+                    <h2>Innovazione guidata dalla <span class="highlight">Passione</span></h2>
+                    <div class="stats-row">
+                        <div>
+                            <div class="stat-value">3+</div>
+                            <div class="stat-label">Anni attivi</div>
+                        </div>
+                        <div>
+                            <div class="stat-value">10+</div>
+                            <div class="stat-label">Progetti</div>
+                        </div>
+                        <div>
+                            <div class="stat-value">🇮🇹</div>
+                            <div class="stat-label">100% italiano</div>
+                        </div>
+                    </div>
+                    <p>Non siamo solo "ragazzi che programmano". Aura è un ecosistema pensato per chi vuole strumenti moderni, sicuri e belli da usare. Unisciti alla nostra community per dare forma al futuro insieme a noi.</p>
+                    <a href="timeline.html" class="btn btn-secondary" style="margin-left: 0;">Leggi la nostra storia</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Open Source -->
+        <section id="opensource" class="reveal">
+            <div class="opensource-section">
+                <div class="os-text">
+                    <h2><i class="fa-brands fa-github" style="color:#58a6ff;"></i> Siamo <span style="color:#58a6ff;">Open Source</span></h2>
+                    <div class="os-stats">
+                        <div class="os-stat">
+                            <div class="os-stat-val">100%</div>
+                            <div class="os-stat-lbl">Codice pubblico</div>
+                        </div>
+                        <div class="os-stat">
+                            <div class="os-stat-val">AGPL   </div>
+                            <div class="os-stat-lbl">Licenza a base GNU</div>
+                        </div>
+                        <div class="os-stat">
+                            <div class="os-stat-val">∞</div>
+                            <div class="os-stat-lbl">Contributi benvenuti</div>
+                        </div>
+                    </div>
+                    <p>Crediamo nella trasparenza radicale e nella forza della collaborazione. Per questo l’intero ecosistema Aura è rilasciato sotto licenza GNU AGPLv3. Tutto il codice è pubblico su GitHub: sei libero di studiarlo, migliorarlo o farne il fork. La AGPL garantisce che Aura rimanga libera per sempre: se modifichi e distribuisci il nostro software (anche via cloud), hai l'obbligo di condividere i tuoi miglioramenti con la stessa libertà. Le porte sono aperte a chiunque voglia costruire con noi.</p>
+                    <a href="https://github.com/madebyanto/aura-open-source-project" target="_blank" class="btn btn-github" style="margin-left: 0;">
+                        <i class="fa-brands fa-github"></i> Vedi il repository
+                    </a>
+                </div>
+                <div class="os-code">
+                    <div class="cmd-comment"># Contribuisci ad Aura</div>
+                    <br>
+                    <div><span class="cmd-text">git clone</span> github.com/madebyanto/<br>&nbsp;&nbsp;aura-open-source-project</div>
+                    <br>
+                    <div><span class="cmd-text">cd</span> aura-open-source-project</div>
+                    <div><span class="cmd-text">npm install</span></div>
+                    <div><span class="cmd-text">npm run dev</span></div>
+                    <br>
+                    <div class="cmd-comment"># Benvenuto nel team! 🎉</div>
+                    <div><span class="cmd-accent">★</span> Star us on GitHub</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Servizi -->
+        <section id="services">
+            <h2>I nostri <span class="highlight">Servizi</span></h2>
+            <div class="card-grid">
+                <div class="card reveal">
+                    <div class="card-icon-container"><img src="images/aura.jpg" alt="Aura+"></div>
+                    <h3>Aura Launchboard</h3>
+                    <p>Tutti i servizi Aura in un unico posto. La tua dashboard per gestire account e strumenti.</p>
+                    <a href="https://apps.aurastudioitalia.it" class="btn btn-secondary">Vai</a>
+                </div>
+                <div class="card reveal" style="transition-delay: 0.1s;">
+                    <div class="card-icon-container"><img src="images/apps/nyra.png" alt="Nyra AI"></div>
+                    <h3>Nyra AI</h3>
+                    <p>La nostra intelligenza artificiale basata su modelli avanzati per assistenza e supporto smart.</p>
+                    <a href="https://nyra.aurastudioitalia.it" class="btn btn-secondary">Prova Nyra</a>
+                </div>
+                <div class="card reveal" style="transition-delay: 0.2s;">
+                    <div class="card-icon-container"><img src="images/apps/others.png" alt="Altro"></div>
+                    <h3>Altro</h3>
+                    <p>Esplora di più dell'ecosistema Aura! Tanti altri strumenti e progetti ti aspettano.</p>
+                    <a href="progetti.html" class="btn btn-secondary">Esplora di più!</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Supporta Aura -->
+        <section class="reveal">
+            <div class="donate-section-wrap">
+                <h2>❤️ Supporta <span class="highlight">Aura</span></h2>
+                <p>Aura è costruito con amore, nel tempo libero, da ragazzi italiani. Nessun investitore, nessun VC — solo la community. Ogni contributo conta davvero.</p>
+                <div class="donate-perks">
+                    <div class="donate-perk"><i class="fa-solid fa-server"></i> Mantiene i server online</div>
+                    <div class="donate-perk"><i class="fa-solid fa-code-branch"></i> Accelera lo sviluppo</div>
+                    <div class="donate-perk"><i class="fa-solid fa-users"></i> Fa crescere la community</div>
+                    <div class="donate-perk"><i class="fa-solid fa-star"></i> Il tuo nome nei crediti</div>
+                </div>
+                <div class="donate-cta-row">
+                    <button class="btn btn-primary" id="section-donate-btn">
+                        <i class="fa-solid fa-heart"></i> Fai una donazione
+                    </button>
+                    <a href="https://github.com/madebyanto/aura-open-source-project" target="_blank" class="btn btn-github">
+                        <i class="fa-brands fa-github"></i> Contribuisci su GitHub
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stay In -->
+        <section>
+            <div class="two-columns reveal" style="background: var(--accent-soft); border-color: rgba(240,91,255,0.2);">
+                <div class="info-text">
+                    <h2>Resta <span class="highlight">aggiornato</span> 🔥</h2>
+                    <p>Ricevi in anteprima novità, sfide esclusive e aggiornamenti sui rilasci direttamente sui tuoi canali preferiti.</p>
+                    <div class="stay-in-buttons">
+                        <a href="https://whatsapp.com/channel/0029VanxEbwL2AU4MyDa1x1n" class="stay-btn whatsapp">
+                            <i class="fa-brands fa-whatsapp"></i> WhatsApp
+                        </a>
+                        <a href="https://discord.gg/JQJyEuufU9" class="stay-btn discord">
+                            <i class="fa-brands fa-discord"></i> Discord
+                        </a>
+                    </div>
+                </div>
+                <div class="info-image">
+                    <img src="images/aura-grafic-2.png" alt="Social Aura">
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <div class="footer-logo-wrap">
+                        <img src="images/aura.jpg" alt="Aura Logo">
+                        <span>Aura Studio Italia</span>
+                    </div>
+                    <p>Senti l'energia di Aura. Creiamo soluzioni digitali per connettere persone e semplificare la quotidianità.</p>
+                    <div class="footer-socials">
+                        <a href="https://discord.gg/JQJyEuufU9" class="social-icon"><i class="fa-brands fa-discord"></i></a>
+                        <a href="https://tiktok.com/@aurastudio.italia" class="social-icon"><i class="fa-brands fa-tiktok"></i></a>
+                        <a href="https://instagram.com/aurastudio.italia" class="social-icon"><i class="fa-brands fa-instagram"></i></a>
+                        <a href="https://youtube.com/@aurastudio.italia" class="social-icon"><i class="fa-brands fa-youtube"></i></a>
+                        <a href="https://github.com/madebyanto/aura-open-source-project" target="_blank" class="social-icon"><i class="fa-brands fa-github"></i></a>
+                    </div>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Servizi</h4>
+                    <ul>
+                        <li><a href="https://apps.aurastudioitalia.it">Launchboard</a></li>
+                        <li><a href="https://nyra.aurastudioitalia.it">Nyra AI</a></li>
+                        <li><a href="progetti.html">Tutti i Progetti</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Risorse</h4>
+                    <ul>
+                        <li><a href="timeline.html">La nostra Storia</a></li>
+                        <li><a href="staffapp.html">Lavora con noi</a></li>
+                        <li><a href="https://support.aurastudioitalia.it">Supporto</a></li>
+                        <li><a href="staff.html">Lo staff</a></li>
+                        <li><a href="https://github.com/madebyanto/aura-open-source-project" target="_blank">GitHub</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-col">
+                    <h4>Legale</h4>
+                    <ul>
+                        <li><a href="https://privacy.aurastudioitalia.it">Centro Privacy</a></li>
+                        <li><a href="https://privacy.aurastudioitalia.it/tos.html">Termini di Servizio</a></li>
+                        <li><a href="https://privacy.aurastudioitalia.it/privacypolicy.html">Privacy Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p class="footer-credit">© 2026 Aura Studio Italia &bull; Multi-Sede (Eboli, Conversano) &bull; <a href="https://github.com/madebyanto/aura-open-source-project" target="_blank" style="color: #58a6ff; text-decoration: none;"><i class="fa-brands fa-github"></i> Open Source</a></p>
+                <p class="footer-credit" style="opacity: 0.5;">v1.4 &bull; <span id="gpu-info"></span></p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // ─── COLLABORATORS DATA ───
+        const collaborators = [
+            { name: "Anto", role: "Founder & Lead Dev", image: "images/staffers/anto.png" },
+            { name: "Giuse", role: "Co-Owner & Staff Coord.", image: "images/staffers/giuse.png" },
+            { name: "Matteo", role: "Head Developer", image: "images/staffers/matteo.png" },
+            { name: "Adam", role: "Designer", image: "images/staffers/adam.png" },
+            { name: "Anto L.", role: "Support Manager", image: "images/staffers/anto-l.png" },
+            { name: "Met", role: "Community Mod", image: "images/aura.jpg" },
+            { name: "Giuseppe", role: "Community Mod", image: "images/staffers/peppe.png" },
+            // Ripetizione per mantenere il ticker fluido
+            { name: "Anto", role: "Founder & Lead Dev", image: "images/staffers/anto.png" },
+            { name: "Giuse", role: "Co-Owner & Staff Coord.", image: "images/staffers/giuse.png" },
+            { name: "Matteo", role: "Head Developer", image: "images/staffers/matteo.png" },
+        ];
+
+        function buildTicker() {
+            const track = document.getElementById('ticker-track');
+            // Duplicate for seamless loop
+            const doubled = [...collaborators, ...collaborators];
+            doubled.forEach(c => {
+                const chip = document.createElement('div');
+                chip.className = 'collaborator-chip';
+                chip.innerHTML = `
+                    <div class="collaborator-avatar">
+                        <img src="${c.image}" alt="${c.name}">
+                    </div>
+                    <div class="collaborator-info">
+                        <div class="collaborator-name">${c.name}</div>
+                        <div class="collaborator-role">${c.role}</div>
+                    </div>
+                `;
+                track.appendChild(chip);
+            });
+        }
+        buildTicker();
+
+        // ─── PARTNERS DATA ───
+        const partners = [
+            { name: "UPLOOP Studio", logo: "images/ext-assets/uploop.png", url: "https://uploopstudio.it" },
+            { name: "MatteDev Studio", logo: "images/ext-assets/mdev.png", url: "https://mattedev.com" },
+            { name: "Partner 3", logo: "images/aura.jpg", url: "#" },
+            { name: "Partner 4", logo: "images/aura.jpg", url: "#" },
+            { name: "Partner 5", logo: "images/aura.jpg", url: "#" },
+        ];
+
+        function buildPartnersTicker() {
+            const track = document.getElementById('partners-track');
+            if (!track) return;
+
+            // Per un loop perfetto senza bug, cloniamo il set di partner
+            // Assicuriamoci che la larghezza totale sia abbondantemente superiore alla larghezza schermo
+            const clones = 4; 
+            const items = Array(clones).fill(partners).flat();
+            
+            track.innerHTML = ''; // Pulizia preventiva
+            
+            items.forEach((p, index) => {
+                const link = document.createElement('a');
+                link.href = p.url;
+                link.target = "_blank";
+                link.rel = "noopener noreferrer"; // Security best practice
+                link.className = 'partner-chip';
+                link.innerHTML = `<img src="${p.logo}" alt="${p.name}" class="partner-logo">`;
+                track.appendChild(link);
+            });
+        }
+        buildPartnersTicker();
+
+        // ─── DONATION MODAL ───
+        const modal = document.getElementById('donation-modal');
+        const modalClose = document.getElementById('modal-close');
+
+        function openModal() {
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeModal() {
+            modal.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+
+        modalClose.addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+
+        document.getElementById('header-donate-btn').addEventListener('click', openModal);
+        document.getElementById('section-donate-btn').addEventListener('click', openModal);
+
+        // Tier selection
+        document.querySelectorAll('.tier-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.tier-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+            });
+        });
+
+        // ─── DONATION TOAST ───
+        const toast = document.getElementById('donation-toast');
+        const toastClose = document.getElementById('toast-close');
+        const toastDonate = document.getElementById('toast-donate-btn');
+
+        // Show toast after 6s
+        setTimeout(() => {
+            if (!sessionStorage.getItem('toast-dismissed')) {
+                toast.classList.add('show');
+            }
+        }, 6000);
+
+        toastClose.addEventListener('click', () => {
+            toast.classList.remove('show');
+            sessionStorage.setItem('toast-dismissed', '1');
+        });
+
+        toastDonate.addEventListener('click', () => {
+            toast.classList.remove('show');
+            sessionStorage.setItem('toast-dismissed', '1');
+            openModal();
+        });
+
+        // ─── SIDEBAR ───
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('sidebar-overlay');
+        const openBtn  = document.getElementById('open-menu');
+        const closeBtn = document.getElementById('close-menu');
+
+        function openSidebar() {
+            sidebar.classList.add('open');
+            overlay.classList.add('visible');
+            openBtn.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeSidebar() {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('visible');
+            openBtn.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        openBtn.addEventListener('click', openSidebar);
+        closeBtn.addEventListener('click', closeSidebar);
+        overlay.addEventListener('click', closeSidebar);
+        document.querySelectorAll('.sidebar a').forEach(l => l.addEventListener('click', closeSidebar));
+
+        // Header scroll
+        const header = document.getElementById('header');
+        window.addEventListener('scroll', () => {
+            header.classList.toggle('scrolled', window.scrollY > 40);
+        }, { passive: true });
+
+        // Scroll reveal
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    e.target.classList.add('visible');
+                    observer.unobserve(e.target);
+                }
+            });
+        }, { threshold: 0.12 });
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // WebGL Info
+        (function() {
+            const canvas = document.createElement('canvas');
+            const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+            const info = gl ? gl.getExtension('WEBGL_debug_renderer_info') : null;
+            document.getElementById('gpu-info').textContent =
+                info ? gl.getParameter(info.UNMASKED_RENDERER_WEBGL) : 'Standard Rendering';
+        })();
+    </script>
+</body>
+</html>
