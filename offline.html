@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aura Offline</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: #0d0d0d;
+      color: #fff;
+      font-family: "Segoe UI", sans-serif;
+      text-align: center;
+    }
+
+    .emoji {
+      font-size: 5rem;
+      margin-bottom: 20px;
+      animation: bounce 1.5s infinite;
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      margin-bottom: 20px;
+      opacity: 0.9;
+    }
+
+    a {
+      display: inline-block;
+      padding: 12px 24px;
+      background: #F05BFF;
+      color: white;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: 0.3s;
+      cursor: pointer;
+    }
+
+    a:hover {
+      background: #c044cc;
+      transform: scale(1.05);
+    }
+
+    @keyframes bounce {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-10px);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="emoji">😵</div>
+  <h1>Ops... sembra che tu sia offline!</h1>
+  <a onclick="retry()">Riprova</a>
+
+  <script>
+    function retry() {
+      // Prova a ricaricare index.html
+      window.location.href = '/index.html';
+    }
+  </script>
+</body>
+</html>

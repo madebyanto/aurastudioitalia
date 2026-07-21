@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configura Ordine | Aura</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <style>
+        :root {
+            --bg: #0b0b0e;
+            --card-bg: rgba(22, 22, 27, 0.9);
+            --accent: #F05BFF;
+            --accent-soft: rgba(240, 91, 255, 0.12);
+            --accent-glow: rgba(240, 91, 255, 0.25);
+            --border: rgba(255, 255, 255, 0.07);
+            --border-accent: rgba(240, 91, 255, 0.25);
+            --text: #ffffff;
+            --muted: #a1a1a6;
+            --gradient: linear-gradient(135deg, #F05BFF 0%, #7000FF 100%);
+            --success: #30d158;
+            --error: #ff6b6b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* ─── Background ─── */
+        .bg-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(120px);
+            pointer-events: none;
+            z-index: 0;
+        }
+        .orb-1 {
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(240,91,255,0.18), transparent 70%);
+            top: -150px; left: -150px;
+            animation: drift 18s ease-in-out infinite alternate;
+        }
+        .orb-2 {
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, rgba(112,0,255,0.12), transparent 70%);
+            bottom: -100px; right: -100px;
+            animation: drift 24s ease-in-out infinite alternate-reverse;
+        }
+        @keyframes drift {
+            from { transform: translate(0,0); }
+            to   { transform: translate(30px, 20px); }
+        }
+
+        .bg-grid {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background-image:
+                linear-gradient(rgba(240,91,255,0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(240,91,255,0.04) 1px, transparent 1px);
+            background-size: 40px 40px;
+            mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black 20%, transparent 100%);
+            -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black 20%, transparent 100%);
+        }
+
+        /* ─── Card ─── */
+        .order-container {
+            position: relative;
+            z-index: 1;
+            background: var(--card-bg);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            width: 90%;
+            max-width: 460px;
+            padding: 44px 40px;
+            border-radius: 32px;
+            border: 1px solid var(--border);
+            box-shadow: 0 30px 80px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.04);
+        }
+
+        /* ─── Progress bar ─── */
+        .progress-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 36px;
+        }
+        .progress-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--border);
+            transition: all 0.4s ease;
+            flex-shrink: 0;
+        }
+        .progress-dot.active { background: var(--accent); box-shadow: 0 0 10px var(--accent-glow); }
+        .progress-dot.done { background: var(--accent); opacity: 0.4; }
+        .progress-line {
+            flex: 1; height: 1px;
+            background: var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+        .progress-line::after {
+            content: '';
+            position: absolute;
+            left: 0; top: 0;
+            height: 100%;
+            background: var(--accent);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        .progress-line.filled::after { width: 100%; }
+
+        /* ─── Steps ─── */
+        .step { display: none; }
+        .step.active {
+            display: block;
+            animation: fadeUp 0.45s ease both;
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(14px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ─── Step header ─── */
+        .step-icon {
+            width: 52px; height: 52px;
+            border-radius: 16px;
+            background: var(--gradient);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+        }
+        .step-icon i { color: white; }
+
+        h2 {
+            font-weight: 800;
+            font-size: 1.6rem;
+            letter-spacing: -0.02em;
+            margin-bottom: 6px;
+        }
+        .step-desc {
+            color: var(--muted);
+            font-size: 0.875rem;
+            font-weight: 300;
+            margin-bottom: 28px;
+            line-height: 1.6;
+        }
+
+        /* ─── Select ─── */
+        .select-wrapper {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        .select-wrapper::after {
+            content: '\f078';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            right: 18px; top: 50%;
+            transform: translateY(-50%);
+            color: var(--muted);
+            font-size: 0.75rem;
+            pointer-events: none;
+        }
+        select {
+            width: 100%;
+            padding: 15px 44px 15px 18px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            color: white;
+            font-size: 0.9rem;
+            font-family: 'Poppins', sans-serif;
+            outline: none;
+            appearance: none;
+            -webkit-appearance: none;
+            transition: border-color 0.25s;
+            cursor: pointer;
+        }
+        select:focus { border-color: var(--border-accent); }
+        select option { background: #1a1a1f; color: white; }
+        select optgroup { color: var(--muted); }
+
+        /* ─── Selected plan preview ─── */
+        .plan-preview {
+            background: var(--accent-soft);
+            border: 1px solid var(--border-accent);
+            border-radius: 14px;
+            padding: 14px 18px;
+            margin-bottom: 20px;
+            display: none;
+            align-items: center;
+            gap: 12px;
+        }
+        .plan-preview.visible { display: flex; }
+        .plan-preview-icon {
+            width: 36px; height: 36px;
+            border-radius: 10px;
+            background: var(--gradient);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+        .plan-preview-text { flex: 1; text-align: left; }
+        .plan-preview-name { font-size: 0.875rem; font-weight: 600; }
+        .plan-preview-price { font-size: 0.75rem; color: var(--accent); font-weight: 600; }
+
+        /* ─── Promo code input ─── */
+        .promo-input-wrapper {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+        .promo-input {
+            flex: 1;
+            padding: 14px 18px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            color: white;
+            font-size: 0.9rem;
+            font-family: 'Poppins', sans-serif;
+            outline: none;
+            transition: border-color 0.25s;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        .promo-input::placeholder { text-transform: none; letter-spacing: normal; color: var(--muted); }
+        .promo-input:focus { border-color: var(--border-accent); }
+        .promo-input.valid   { border-color: rgba(48, 209, 88, 0.5); }
+        .promo-input.invalid { border-color: rgba(255, 107, 107, 0.5); }
+
+        .btn-check-promo {
+            padding: 14px 18px;
+            border-radius: 14px;
+            border: 1px solid var(--border-accent);
+            background: var(--accent-soft);
+            color: var(--accent);
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-check-promo:hover { background: rgba(240,91,255,0.2); }
+        .btn-check-promo:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-check-promo .spinner {
+            width: 14px; height: 14px;
+            border: 2px solid rgba(240,91,255,0.3);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: none;
+        }
+        .btn-check-promo.loading .spinner { display: block; }
+        .btn-check-promo.loading .btn-check-icon { display: none; }
+
+        /* ─── Promo feedback ─── */
+        .promo-feedback {
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-size: 0.82rem;
+            font-weight: 400;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+        .promo-feedback.show { display: flex; }
+        .promo-feedback.success {
+            background: rgba(48, 209, 88, 0.08);
+            border: 1px solid rgba(48, 209, 88, 0.25);
+            color: #30d158;
+        }
+        .promo-feedback.error {
+            background: rgba(255, 107, 107, 0.08);
+            border: 1px solid rgba(255, 107, 107, 0.2);
+            color: var(--error);
+        }
+        .promo-feedback i { font-size: 0.9rem; flex-shrink: 0; }
+
+        /* ─── Skip promo link ─── */
+        .skip-link {
+            display: block;
+            text-align: center;
+            color: var(--muted);
+            font-size: 0.78rem;
+            cursor: pointer;
+            margin-top: 12px;
+            transition: color 0.2s;
+            text-decoration: none;
+        }
+        .skip-link:hover { color: var(--text); }
+
+        /* ─── Data box ─── */
+        .data-box {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-accent);
+            border-radius: 18px;
+            padding: 20px;
+            margin-bottom: 24px;
+            text-align: left;
+        }
+        .data-box-title {
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 14px;
+        }
+        .data-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            padding: 9px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            color: var(--muted);
+        }
+        .data-item:last-child { border-bottom: none; padding-bottom: 0; }
+        .data-item-label { font-weight: 300; }
+        .data-item-value { color: var(--text); font-weight: 600; font-size: 0.82rem; max-width: 200px; text-align: right; overflow: hidden; text-overflow: ellipsis; }
+        .data-item-value.uid { color: var(--muted); font-size: 0.72rem; font-family: monospace; }
+        .data-item-value.plan-value { color: var(--accent); }
+
+        /* ─── Price summary in data box ─── */
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 9px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+        .price-row:last-child { border-bottom: none; padding-bottom: 0; }
+        .price-original {
+            color: var(--muted);
+            text-decoration: line-through;
+            font-size: 0.78rem;
+        }
+        .price-discount-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: rgba(48, 209, 88, 0.1);
+            border: 1px solid rgba(48, 209, 88, 0.25);
+            color: #30d158;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 20px;
+            margin-left: 6px;
+        }
+        .price-final {
+            color: #30d158;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+        .price-full {
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        /* ─── Buttons ─── */
+        .btn {
+            width: 100%;
+            padding: 15px;
+            border-radius: 50px;
+            border: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.25s;
+            margin-top: 10px;
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-primary {
+            background: var(--gradient);
+            color: white;
+            box-shadow: 0 8px 24px var(--accent-glow);
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 14px 36px var(--accent-glow); }
+        .btn-primary:active { transform: translateY(0); }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--muted);
+            border: 1px solid var(--border);
+        }
+        .btn-ghost:hover { color: var(--text); border-color: rgba(255,255,255,0.15); background: rgba(255,255,255,0.04); }
+
+        .btn-danger {
+            background: transparent;
+            color: #ff6b6b;
+            border: 1px solid rgba(255,107,107,0.2);
+        }
+        .btn-danger:hover { background: rgba(255,107,107,0.08); border-color: rgba(255,107,107,0.35); }
+
+        /* ─── Loader ─── */
+        .loader-wrapper { text-align: center; padding: 20px 0; }
+        .loader {
+            width: 48px; height: 48px;
+            border-radius: 50%;
+            border: 3px solid rgba(255,255,255,0.07);
+            border-top-color: var(--accent);
+            animation: spin 0.9s linear infinite;
+            margin: 24px auto;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loader-text { color: var(--muted); font-size: 0.85rem; font-weight: 300; }
+
+        /* ─── Success ─── */
+        .success-wrapper { text-align: center; padding: 10px 0; display: none; }
+        .success-icon {
+            width: 72px; height: 72px;
+            border-radius: 50%;
+            background: rgba(48, 209, 88, 0.1);
+            border: 1px solid rgba(48, 209, 88, 0.25);
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 1.8rem;
+            color: var(--success);
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+        }
+        @keyframes popIn {
+            from { transform: scale(0.5); opacity: 0; }
+            to   { transform: scale(1); opacity: 1; }
+        }
+        .success-wrapper h2 { margin-bottom: 10px; }
+        .success-wrapper .step-desc { margin-bottom: 28px; }
+
+        /* ─── Back link ─── */
+        .back-link {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--muted);
+            font-size: 0.78rem;
+            text-decoration: none;
+            margin-bottom: 28px;
+            transition: color 0.2s;
+            width: fit-content;
+        }
+        .back-link:hover { color: var(--text); }
+    </style>
+</head>
+<body>
+
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+    <div class="bg-grid"></div>
+
+    <div class="order-container">
+
+        <a href="index.html" class="back-link">
+            <i class="fa-solid fa-arrow-left"></i> Torna ai piani
+        </a>
+
+        <!-- Progress: 4 step ora -->
+        <div class="progress-bar" id="progress-bar">
+            <div class="progress-dot active" id="dot-1"></div>
+            <div class="progress-line" id="line-1"></div>
+            <div class="progress-dot" id="dot-2"></div>
+            <div class="progress-line" id="line-2"></div>
+            <div class="progress-dot" id="dot-3"></div>
+            <div class="progress-line" id="line-3"></div>
+            <div class="progress-dot" id="dot-4"></div>
+        </div>
+
+        <!-- Step 1: Piano -->
+        <div class="step active" id="step1">
+            <div class="step-icon"><i class="fa-solid fa-bolt"></i></div>
+            <h2>Scegli il Piano</h2>
+            <p class="step-desc">Seleziona la soluzione più adatta alle tue esigenze.</p>
+
+            <div class="select-wrapper">
+                <select id="plan" onchange="updatePlanPreview()">
+                    <option value="" disabled selected>Seleziona un piano...</option>
+                    <optgroup label="🔥 Professionale">
+                        <option value="Normal Base" data-price="50">Normal Base — 50€</option>
+                        <option value="Normal Standard" data-price="70">Normal Standard — 70€</option>
+                        <option value="Normal Premium" data-price="100">Normal Premium — 100€</option>
+                    </optgroup>
+                    <optgroup label="💸 Budget">
+                        <option value="Budget Base" data-price="20">Budget Base — 20€</option>
+                        <option value="Budget Standard" data-price="35">Budget Standard — 35€</option>
+                        <option value="Budget Premium" data-price="50">Budget Premium — 50€</option>
+                    </optgroup>
+                </select>
+            </div>
+
+            <div class="plan-preview" id="plan-preview">
+                <div class="plan-preview-icon"><i class="fa-solid fa-check" style="color:white;"></i></div>
+                <div class="plan-preview-text">
+                    <div class="plan-preview-name" id="preview-name">—</div>
+                    <div class="plan-preview-price" id="preview-price">—</div>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" onclick="goToStep(2)">
+                Continua <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </div>
+
+        <!-- Step 2: Codice Promozionale -->
+        <div class="step" id="step2">
+            <div class="step-icon"><i class="fa-solid fa-tag"></i></div>
+            <h2>Codice Promo</h2>
+            <p class="step-desc">Hai un codice sconto? Inseriscilo qui. Puoi anche saltare questo passaggio.</p>
+
+            <div class="promo-input-wrapper">
+                <input
+                    type="text"
+                    class="promo-input"
+                    id="promo-code"
+                    placeholder="Es. AURA2026"
+                    maxlength="20"
+                    oninput="resetPromoState()"
+                />
+                <button class="btn-check-promo" id="btn-check-promo" onclick="checkPromoCode()">
+                    <span class="spinner"></span>
+                    <i class="fa-solid fa-magnifying-glass btn-check-icon"></i>
+                    Verifica
+                </button>
+            </div>
+
+            <div class="promo-feedback" id="promo-feedback"></div>
+
+            <button class="btn btn-primary" id="btn-promo-continue" onclick="goToStep(3)" style="margin-top:4px;">
+                Continua <i class="fa-solid fa-arrow-right"></i>
+            </button>
+            <button class="btn btn-ghost" onclick="goToStep(1)">
+                <i class="fa-solid fa-arrow-left"></i> Modifica piano
+            </button>
+            <a class="skip-link" onclick="skipPromo()">
+                Salta, procedi senza sconto →
+            </a>
+        </div>
+
+        <!-- Step 3: Riepilogo -->
+        <div class="step" id="step3">
+            <div class="step-icon"><i class="fa-solid fa-user-check"></i></div>
+            <h2>Riepilogo Ordine</h2>
+            <p class="step-desc">Verifica i tuoi dati prima di confermare. Saranno inviati al team Aura.</p>
+
+            <div class="data-box">
+                <div class="data-box-title">Dati cliente</div>
+                <div class="data-item">
+                    <span class="data-item-label">Nome</span>
+                    <span class="data-item-value" id="display-name">—</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-item-label">Cognome</span>
+                    <span class="data-item-value" id="display-surname">—</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-item-label">Email</span>
+                    <span class="data-item-value" id="display-email">—</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-item-label">Aura UID</span>
+                    <span class="data-item-value uid" id="display-uid">—</span>
+                </div>
+                <div class="data-item">
+                    <span class="data-item-label">Piano selezionato</span>
+                    <span class="data-item-value plan-value" id="display-plan">—</span>
+                </div>
+            </div>
+
+            <div class="data-box" id="price-box">
+                <div class="data-box-title">Riepilogo prezzi</div>
+                <div class="price-row">
+                    <span style="font-weight:300; color:var(--muted);">Prezzo base</span>
+                    <span id="summary-base-price" style="color:var(--text); font-weight:600; font-size:0.85rem;">—</span>
+                </div>
+                <div class="price-row" id="discount-row" style="display:none;">
+                    <span style="font-weight:300; color:var(--muted);">
+                        Sconto
+                        <span class="price-discount-badge" id="discount-badge">—</span>
+                    </span>
+                    <span id="summary-discount" style="color:#30d158; font-weight:600; font-size:0.85rem;">—</span>
+                </div>
+                <div class="price-row" style="border-top: 1px solid rgba(255,255,255,0.07); padding-top:13px; margin-top:4px;">
+                    <span style="font-weight:600; color:var(--text);">Totale</span>
+                    <span id="summary-total" class="price-full">—</span>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" onclick="submitRequest()">
+                <i class="fa-solid fa-paper-plane"></i> Conferma Ordine
+            </button>
+            <button class="btn btn-ghost" onclick="goToStep(2)">
+                <i class="fa-solid fa-arrow-left"></i> Modifica promo
+            </button>
+            <button class="btn btn-danger" onclick="window.location.href='index.html'">
+                Annulla
+            </button>
+        </div>
+
+        <!-- Step 4: Elaborazione / Successo -->
+        <div class="step" id="step4">
+            <div class="loader-wrapper" id="loading">
+                <div class="step-icon" style="margin: 0 auto 20px;"><i class="fa-solid fa-rocket"></i></div>
+                <h2>Elaborazione...</h2>
+                <div class="loader"></div>
+                <p class="loader-text">Stiamo inviando il tuo ordine al team Aura.</p>
+            </div>
+
+            <div class="success-wrapper" id="success">
+                <div class="success-icon"><i class="fa-solid fa-check"></i></div>
+                <h2>Richiesta Ricevuta!</h2>
+                <p class="step-desc">Il team Aura ha preso in carico il tuo ordine.<br>Ti contatteremo presto via email!</p>
+                <button class="btn btn-primary" onclick="window.location.href='/index.html'">
+                    <i class="fa-solid fa-house"></i> Vai al sito
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyDsrHAtIh5bsYDHa1wz0LMcmciChAoRikU",
+        authDomain: "myauraid-f03c6.firebaseapp.com",
+        projectId: "myauraid-f03c6",
+        storageBucket: "myauraid-f03c6.appspot.com",
+        messagingSenderId: "190478237725",
+        appId: "1:190478237725:web:0d39907473f511b85a06f4"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    let orderData = {};
+    // Promo state
+    let promoState = {
+        code: null,       // codice usato (null = nessuno)
+        offPercent: 0,    // 0 = nessuno sconto
+        valid: false
+    };
+
+    // ─── Auth ───
+    auth.onAuthStateChanged(user => {
+        if (!user) { window.location.href = '/index.html'; return; }
+        db.collection('users').doc(user.uid).get().then(doc => {
+            if (doc.exists) {
+                const data = doc.data();
+                orderData = { uid: user.uid, nome: data.nome, cognome: data.cognome, email: user.email };
+                document.getElementById('display-name').textContent    = data.nome;
+                document.getElementById('display-surname').textContent = data.cognome;
+                document.getElementById('display-email').textContent   = user.email;
+                document.getElementById('display-uid').textContent     = user.uid.substring(0, 16) + '...';
+            }
+        });
+    });
+
+    // ─── Helpers piano ───
+    function getSelectedPlanData() {
+        const sel = document.getElementById('plan');
+        const opt = sel.options[sel.selectedIndex];
+        if (!opt || !opt.value) return null;
+        return {
+            name: opt.value,
+            price: parseInt(opt.dataset.price, 10)
+        };
+    }
+
+    function updatePlanPreview() {
+        const plan = getSelectedPlanData();
+        if (!plan) return;
+        document.getElementById('preview-name').textContent  = plan.name;
+        document.getElementById('preview-price').textContent = plan.price + '€';
+        document.getElementById('plan-preview').classList.add('visible');
+        // Resetta il promo se si cambia piano
+        resetPromoState();
+    }
+
+    // ─── Promo code ───
+    function resetPromoState() {
+        promoState = { code: null, offPercent: 0, valid: false };
+        const input    = document.getElementById('promo-code');
+        const feedback = document.getElementById('promo-feedback');
+        input.classList.remove('valid', 'invalid');
+        feedback.classList.remove('show', 'success', 'error');
+        feedback.innerHTML = '';
+        // Continua sempre visibile (si può andare avanti senza promo)
+    }
+
+    async function checkPromoCode() {
+        const input = document.getElementById('promo-code');
+        const code  = input.value.trim().toUpperCase();
+        if (!code) return;
+
+        const plan = getSelectedPlanData();
+        const btn  = document.getElementById('btn-check-promo');
+        const feedback = document.getElementById('promo-feedback');
+
+        // Loading state
+        btn.disabled = true;
+        btn.classList.add('loading');
+        input.classList.remove('valid', 'invalid');
+        feedback.classList.remove('show', 'success', 'error');
+
+        try {
+            const snap = await db.collection('discount').doc(code).get();
+
+            btn.disabled = false;
+            btn.classList.remove('loading');
+
+            if (!snap.exists) {
+                // Codice non trovato
+                input.classList.add('invalid');
+                feedback.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Codice non valido o inesistente.';
+                feedback.className = 'promo-feedback show error';
+                promoState = { code: null, offPercent: 0, valid: false };
+                return;
+            }
+
+            const data = snap.data();
+            const offPercent = data.off; // int64 → JS number
+
+            if (!offPercent || offPercent <= 0 || offPercent > 100) {
+                input.classList.add('invalid');
+                feedback.innerHTML = '<i class="fa-solid fa-circle-xmark"></i> Codice non valido.';
+                feedback.className = 'promo-feedback show error';
+                promoState = { code: null, offPercent: 0, valid: false };
+                return;
+            }
+
+            // Valido!
+            promoState = { code, offPercent, valid: true };
+            input.classList.add('valid');
+
+            // Calcola risparmio
+            let discountMsg = '';
+            if (plan) {
+                const risparmio = Math.round(plan.price * offPercent / 100);
+                const finale    = plan.price - risparmio;
+                discountMsg = ` — risparmi <strong>${risparmio}€</strong>, paghi <strong>${finale}€</strong>`;
+            }
+            feedback.innerHTML = `<i class="fa-solid fa-circle-check"></i> Codice <strong>${code}</strong> applicato: ${offPercent}% di sconto${discountMsg}!`;
+            feedback.className = 'promo-feedback show success';
+
+        } catch (err) {
+            console.error(err);
+            btn.disabled = false;
+            btn.classList.remove('loading');
+            feedback.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Errore di connessione. Riprova.';
+            feedback.className = 'promo-feedback show error';
+        }
+    }
+
+    function skipPromo() {
+        promoState = { code: null, offPercent: 0, valid: false };
+        document.getElementById('promo-code').value = '';
+        resetPromoState();
+        goToStep(3);
+    }
+
+    // ─── Progress (4 step) ───
+    function updateProgress(step) {
+        const total = 4;
+        for (let i = 1; i <= total; i++) {
+            const dot  = document.getElementById('dot-' + i);
+            const line = document.getElementById('line-' + i);
+            dot.classList.remove('active', 'done');
+            if (line) line.classList.remove('filled');
+            if (i < step)  { dot.classList.add('done'); if (line) line.classList.add('filled'); }
+            if (i === step) dot.classList.add('active');
+        }
+    }
+
+    function goToStep(num) {
+        // Validazione step 1
+        if (num === 2 && !document.getElementById('plan').value) {
+            const sel = document.getElementById('plan');
+            sel.style.borderColor = 'rgba(255,107,107,0.5)';
+            setTimeout(() => sel.style.borderColor = '', 1500);
+            return;
+        }
+
+        // Popolamento riepilogo al passaggio allo step 3
+        if (num === 3) {
+            buildSummary();
+        }
+
+        document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+        document.getElementById('step' + num).classList.add('active');
+        updateProgress(num);
+    }
+
+    function buildSummary() {
+        const plan = getSelectedPlanData();
+        if (!plan) return;
+
+        document.getElementById('display-plan').textContent    = plan.name + ' (' + plan.price + '€)';
+        document.getElementById('summary-base-price').textContent = plan.price + '€';
+
+        const discountRow = document.getElementById('discount-row');
+        const totalEl     = document.getElementById('summary-total');
+
+        if (promoState.valid && promoState.offPercent > 0) {
+            const risparmio = Math.round(plan.price * promoState.offPercent / 100);
+            const finale    = plan.price - risparmio;
+
+            document.getElementById('discount-badge').textContent  = '-' + promoState.offPercent + '%';
+            document.getElementById('summary-discount').textContent = '-' + risparmio + '€';
+            discountRow.style.display = 'flex';
+
+            totalEl.textContent = finale + '€';
+            totalEl.className   = 'price-final';
+        } else {
+            discountRow.style.display = 'none';
+            totalEl.textContent = plan.price + '€';
+            totalEl.className   = 'price-full';
+        }
+    }
+
+    // ─── Submit ───
+    async function submitRequest() {
+        goToStep(4);
+
+        const plan = getSelectedPlanData();
+        const basePrice  = plan ? plan.price : 0;
+        const risparmio  = promoState.valid ? Math.round(basePrice * promoState.offPercent / 100) : 0;
+        const prezzoFinale = basePrice - risparmio;
+
+        const payload = {
+            progetto:       "Sviluppo Web Aura",
+            piano_scelto:   plan ? (plan.name + ' (' + basePrice + '€)') : '—',
+            prezzo_base:    basePrice + '€',
+            codice_promo:   promoState.valid ? promoState.code : null,
+            sconto_perc:    promoState.valid ? promoState.offPercent + '%' : null,
+            prezzo_finale:  prezzoFinale + '€',
+            cliente:        orderData.nome + ' ' + orderData.cognome,
+            email_cliente:  orderData.email,
+            uid:            orderData.uid,
+            timestamp:      new Date().toLocaleString('it-IT')
+        };
+
+        const WEBHOOK_URL = "https://script.google.com/macros/s/AKfycbyIt7nUlQerW2mlMShCI032FBD5vSImUfJAiNi4m63BbwLBVdWdKyLO_u4GQXQP1AY2Ew/exec";
+
+        try {
+            await fetch(WEBHOOK_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+            setTimeout(() => {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('success').style.display  = 'block';
+            }, 1800);
+        } catch (err) {
+            console.error(err);
+            alert("Connessione fallita. Riprova.");
+            goToStep(3);
+        }
+    }
+</script>
+</body>
+</html>
